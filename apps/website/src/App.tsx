@@ -1,13 +1,10 @@
 import {
-  MapPin,
   Zap,
   Bell,
   QrCode,
   Clock,
   TrendingUp,
-  Users,
   BarChart3,
-  MessageSquare,
   ChevronRight,
   Apple,
   Play,
