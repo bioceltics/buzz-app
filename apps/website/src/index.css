@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-secondary-500;
+  }
+
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r from-primary-500 to-secondary-500;
+  }
+
+  .bg-gradient-dark {
+    @apply bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900;
+  }
+}
