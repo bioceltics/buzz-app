@@ -19,15 +19,42 @@ body {
 }
 
 @layer utilities {
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-secondary-500;
+  .text-brand {
+    @apply text-primary-500;
   }
 
-  .bg-gradient-primary {
-    @apply bg-gradient-to-r from-primary-500 to-secondary-500;
+  .bg-brand {
+    @apply bg-primary-500;
   }
 
-  .bg-gradient-dark {
-    @apply bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900;
+  .bg-brand-dark {
+    @apply bg-gray-900;
   }
+
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-gray-900/80 backdrop-blur-xl border border-white/10;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
 }

@@ -283,14 +283,8 @@ export default {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-primary': 'linear-gradient(135deg, #E91E63 0%, #F06292 100%)',
-        'gradient-secondary': 'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
+        // Kept for dark backgrounds only
         'gradient-dark': 'linear-gradient(135deg, #1A1A2E 0%, #2D2D44 100%)',
-        'gradient-success': 'linear-gradient(135deg, #00C853 0%, #69F0AE 100%)',
-        'gradient-sunset': 'linear-gradient(135deg, #E91E63 0%, #FF9100 100%)',
-        'gradient-futuristic': 'linear-gradient(135deg, #E91E63 0%, #7C3AED 50%, #00BCD4 100%)',
-        'gradient-neon': 'linear-gradient(135deg, #FF1744 0%, #E91E63 100%)',
-        'gradient-cyberpunk': 'linear-gradient(135deg, #E91E63 0%, #00BCD4 100%)',
       },
     },
   },

@@ -93,14 +93,14 @@ export function LoginPage() {
       {/* Decorative floating elements */}
       <motion.div
         animate={floatingAnimation}
-        className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-primary-200/30 to-secondary-200/30 rounded-full blur-3xl pointer-events-none"
+        className="absolute -top-20 -right-20 w-40 h-40 bg-primary-100/50 rounded-full blur-3xl pointer-events-none"
       />
       <motion.div
         animate={{
           ...floatingAnimation,
           transition: { ...floatingAnimation.transition, delay: 1 },
         }}
-        className="absolute -bottom-20 -left-20 w-32 h-32 bg-gradient-to-br from-secondary-200/30 to-primary-200/30 rounded-full blur-3xl pointer-events-none"
+        className="absolute -bottom-20 -left-20 w-32 h-32 bg-secondary-100/50 rounded-full blur-3xl pointer-events-none"
       />
 
       {/* Mobile Logo */}
@@ -111,7 +111,7 @@ export function LoginPage() {
         <motion.div
           whileHover={{ scale: 1.05, rotate: 5 }}
           whileTap={{ scale: 0.95 }}
-          className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-primary shadow-button mb-4 relative overflow-hidden group cursor-pointer"
+          className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-500 shadow-lg shadow-primary-500/25 mb-4 relative overflow-hidden group cursor-pointer"
         >
           <motion.div
             className="absolute inset-0 bg-white/20"
@@ -123,7 +123,7 @@ export function LoginPage() {
         </motion.div>
         <motion.h1
           variants={fadeInUp}
-          className="text-3xl font-bold text-gradient"
+          className="text-3xl font-bold text-gray-900"
         >
           Buzz
         </motion.h1>

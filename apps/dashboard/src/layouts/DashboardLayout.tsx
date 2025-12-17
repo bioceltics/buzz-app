@@ -72,11 +72,11 @@ export function DashboardLayout() {
         {/* Logo */}
         <div className="flex items-center justify-between h-18 px-6 border-b border-gray-100">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-button">
+            <div className="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center shadow-lg shadow-primary-500/25">
               <span className="text-white font-bold text-xl">B</span>
             </div>
             <div>
-              <span className="text-2xl font-bold text-gradient">Buzz</span>
+              <span className="text-2xl font-bold text-gray-900">Buzz</span>
               <span className="ml-2 px-2 py-0.5 bg-primary-100 text-primary-700 text-2xs font-semibold rounded-full">
                 PRO
               </span>
@@ -94,7 +94,7 @@ export function DashboardLayout() {
         {venue && (
           <div className="px-4 py-4 border-b border-gray-100">
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-              <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-primary-500 flex items-center justify-center shadow-lg shadow-primary-500/20">
                 <Building2 className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1 min-w-0">
@@ -160,7 +160,7 @@ export function DashboardLayout() {
         {/* User Menu */}
         <div className="border-t border-gray-100 p-4">
           <div className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
-            <div className="w-10 h-10 rounded-full bg-gradient-secondary flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 rounded-full bg-secondary-500 flex items-center justify-center shadow-lg shadow-secondary-500/20">
               <span className="text-sm font-bold text-white">
                 {user?.email?.[0].toUpperCase()}
               </span>
