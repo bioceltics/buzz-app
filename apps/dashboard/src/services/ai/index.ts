@@ -16,6 +16,10 @@ export { CustomerSegmentationService, customerSegmentationService } from './cust
 export { FraudDetectionService, fraudDetectionService } from './fraudDetection';
 export { PopularityScoringService, popularityScoringService } from './popularityScoring';
 
+// Content Generation
+export { contentGenerator, generateDealContent, suggestTitle, improveDescription } from './contentGenerator';
+export type { DealContentInput, GeneratedContent } from './contentGenerator';
+
 // AI Service Manager - coordinates all AI services
 import { recommendationEngine } from './recommendationEngine';
 import { demandForecastingService } from './demandForecasting';
