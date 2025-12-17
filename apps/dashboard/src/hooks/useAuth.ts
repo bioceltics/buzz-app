@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 interface AuthState {
   user: User | null;
@@ -8,7 +8,26 @@ interface AuthState {
   isLoading: boolean;
   isAdmin: boolean;
   venue: any | null;
+  isDemoMode: boolean;
 }
+
+// Demo user for preview mode
+const DEMO_USER = {
+  id: 'demo-user-id',
+  email: 'demo@buzz.app',
+  user_metadata: { full_name: 'Demo User' },
+} as unknown as User;
+
+const DEMO_VENUE = {
+  id: 'demo-venue-id',
+  name: 'Demo Venue',
+  type: 'restaurant',
+  description: 'A demo venue for previewing the dashboard',
+  address: '123 Demo Street',
+  city: 'San Francisco',
+  state: 'CA',
+  status: 'approved',
+};
 
 export function useAuth() {
   const [state, setState] = useState<AuthState>({
@@ -17,9 +36,23 @@ export function useAuth() {
     isLoading: true,
     isAdmin: false,
     venue: null,
+    isDemoMode: !isSupabaseConfigured,
   });
 
   useEffect(() => {
+    // If Supabase is not configured, use demo mode
+    if (!isSupabaseConfigured) {
+      setState({
+        user: DEMO_USER,
+        session: null,
+        isLoading: false,
+        isAdmin: true,
+        venue: DEMO_VENUE,
+        isDemoMode: true,
+      });
+      return;
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setState((prev) => ({
@@ -32,6 +65,12 @@ export function useAuth() {
       if (session?.user) {
         fetchUserData(session.user.id);
       }
+    }).catch((error) => {
+      console.error('Error getting session:', error);
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+      }));
     });
 
     // Listen for auth changes
