@@ -28,6 +28,9 @@ import { SettingsPage } from '@/pages/settings/SettingsPage';
 import { AdminVenuesPage } from '@/pages/admin/AdminVenuesPage';
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage';
 
+// AI Pages
+import { AIInsightsPage } from '@/pages/ai/AIInsightsPage';
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
@@ -99,6 +102,7 @@ export default function App() {
         <Route path="/events" element={<EventsPage />} />
         <Route path="/events/new" element={<CreateEventPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/ai-insights" element={<AIInsightsPage />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/settings" element={<SettingsPage />} />
 

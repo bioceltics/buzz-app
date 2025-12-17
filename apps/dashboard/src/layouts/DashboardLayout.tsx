@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Search,
   Sparkles,
+  Brain,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -25,6 +26,7 @@ const navigation = [
   { name: 'Deals', href: '/deals', icon: Tag },
   { name: 'Events', href: '/events', icon: Calendar },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'AI Insights', href: '/ai-insights', icon: Brain },
   { name: 'Messages', href: '/chat', icon: MessageSquare },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
