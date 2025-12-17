@@ -243,10 +243,10 @@ export function DashboardPage() {
                 />
 
                 <div className="relative">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <motion.div
                       variants={iconFloat}
-                      className={`stat-icon ${colorClasses.bg} ring-8 ${colorClasses.ring}`}
+                      className={`stat-icon flex-shrink-0 ${colorClasses.bg} ring-8 ${colorClasses.ring}`}
                     >
                       <stat.icon className={`w-6 h-6 ${colorClasses.icon}`} />
                     </motion.div>
@@ -254,7 +254,7 @@ export function DashboardPage() {
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1 + 0.3 }}
-                      className={`stat-change ${
+                      className={`stat-change flex-shrink-0 ${
                         stat.changeType === 'up' ? 'stat-change-up' : 'stat-change-down'
                       }`}
                     >
@@ -266,16 +266,16 @@ export function DashboardPage() {
                       {stat.change}
                     </motion.div>
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-4 min-w-0">
                     <motion.p
-                      className="stat-value"
+                      className="stat-value truncate"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 + 0.2 }}
                     >
                       {stat.value}
                     </motion.p>
-                    <p className="stat-label">{stat.name}</p>
+                    <p className="stat-label truncate">{stat.name}</p>
                   </div>
                 </div>
               </motion.div>
@@ -317,14 +317,14 @@ export function DashboardPage() {
                 to="/deals/new"
                 className="flex items-center gap-4 p-4 bg-gradient-primary rounded-xl text-white hover:translate-y-[-2px] hover:shadow-button-hover transition-all group"
               >
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm flex-shrink-0">
                   <Tag className="w-5 h-5" />
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold">Create New Deal</p>
-                  <p className="text-sm text-white/80">Attract more customers</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold truncate">Create New Deal</p>
+                  <p className="text-sm text-white/80 truncate">Attract more customers</p>
                 </div>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform flex-shrink-0" />
               </Link>
             </motion.div>
 
@@ -333,14 +333,14 @@ export function DashboardPage() {
                 to="/events/new"
                 className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group"
               >
-                <div className="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Calendar className="w-5 h-5 text-secondary-600" />
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">Schedule Event</p>
-                  <p className="text-sm text-gray-500">Plan your next event</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900 truncate">Schedule Event</p>
+                  <p className="text-sm text-gray-500 truncate">Plan your next event</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 group-hover:text-gray-600 transition-all" />
+                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 group-hover:text-gray-600 transition-all flex-shrink-0" />
               </Link>
             </motion.div>
 
@@ -349,12 +349,12 @@ export function DashboardPage() {
                 to="/chat"
                 className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group"
               >
-                <div className="w-10 h-10 bg-info-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-info-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <MessageSquare className="w-5 h-5 text-info-600" />
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">View Messages</p>
-                  <p className="text-sm text-gray-500">3 unread messages</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900 truncate">View Messages</p>
+                  <p className="text-sm text-gray-500 truncate">3 unread messages</p>
                 </div>
                 <motion.span
                   initial={{ scale: 0 }}
@@ -365,7 +365,7 @@ export function DashboardPage() {
                     damping: 15,
                     delay: 0.5
                   }}
-                  className="px-2.5 py-1 bg-error-500 text-white text-xs font-bold rounded-full"
+                  className="px-2.5 py-1 bg-error-500 text-white text-xs font-bold rounded-full flex-shrink-0"
                 >
                   3
                 </motion.span>

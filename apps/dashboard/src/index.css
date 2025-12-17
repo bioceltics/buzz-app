@@ -176,8 +176,12 @@
 
   /* ===== CARDS ===== */
   .card {
-    @apply bg-white rounded-3xl shadow-card border border-gray-100/50 overflow-hidden;
+    @apply bg-white rounded-2xl shadow-card border border-gray-100/50 p-6;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .card-overflow-hidden {
+    @apply overflow-hidden;
   }
 
   .card-hover:hover {
@@ -210,9 +214,14 @@
     @apply bg-primary-500 text-white border-0;
   }
 
-  .card-header { @apply px-6 py-5 border-b border-gray-100/80; }
-  .card-body { @apply p-6; }
-  .card-footer { @apply px-6 py-4 bg-gray-50/50 border-t border-gray-100/80; }
+  .card-header { @apply -mx-6 -mt-6 px-6 py-5 mb-6 border-b border-gray-100/80; }
+  .card-body { @apply -m-6 p-6; }
+  .card-footer { @apply -mx-6 -mb-6 mt-6 px-6 py-4 bg-gray-50/50 border-t border-gray-100/80; }
+
+  /* Card without default padding (for custom layouts) */
+  .card-compact {
+    @apply p-0;
+  }
 
   /* ===== BADGES ===== */
   .badge {

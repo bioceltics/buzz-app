@@ -104,73 +104,73 @@ export function AIInsightsPage() {
 
       {/* AI Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="card p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Recommendation Accuracy</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+        <div className="card">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-gray-500 truncate">Recommendation Accuracy</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">
                 {Math.round((aiSummary?.recommendationAccuracy || 0) * 100)}%
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
               <Target className="w-6 h-6 text-primary-600" />
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
+            <ArrowUpRight className="w-4 h-4 text-green-500 mr-1 flex-shrink-0" />
             <span className="text-green-600 font-medium">+5%</span>
-            <span className="text-gray-500 ml-2">vs last month</span>
+            <span className="text-gray-500 ml-2 truncate">vs last month</span>
           </div>
         </div>
 
-        <div className="card p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Engagement Lift</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+        <div className="card">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-gray-500 truncate">Engagement Lift</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">
                 +{Math.round((aiSummary?.userEngagementLift || 0) * 100)}%
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
               <TrendingUp className="w-6 h-6 text-green-600" />
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-500">From AI-powered recommendations</span>
+            <span className="text-gray-500 truncate">From AI-powered recommendations</span>
           </div>
         </div>
 
-        <div className="card p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Revenue Impact</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+        <div className="card">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-gray-500 truncate">Revenue Impact</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">
                 +{Math.round((aiSummary?.venueRevenueLift || 0) * 100)}%
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
               <DollarSign className="w-6 h-6 text-amber-600" />
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-500">Attributed to AI optimization</span>
+            <span className="text-gray-500 truncate">Attributed to AI optimization</span>
           </div>
         </div>
 
-        <div className="card p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Fraud Prevented</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+        <div className="card">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-gray-500 truncate">Fraud Prevented</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">
                 ${aiSummary?.fraudValueSaved || 0}
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
               <ShieldCheck className="w-6 h-6 text-red-600" />
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-500">{aiSummary?.fraudsPrevented || 0} suspicious activities blocked</span>
+            <span className="text-gray-500 truncate">{aiSummary?.fraudsPrevented || 0} suspicious activities blocked</span>
           </div>
         </div>
       </div>
@@ -178,17 +178,17 @@ export function AIInsightsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Demand Forecast */}
         <div className="card">
-          <div className="card-header flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+          <div className="card-header flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <BarChart3 className="w-5 h-5 text-blue-600" />
               </div>
-              <div>
-                <h2 className="font-bold text-gray-900">Demand Forecast</h2>
-                <p className="text-sm text-gray-500">Today's predicted traffic</p>
+              <div className="min-w-0">
+                <h2 className="font-bold text-gray-900 truncate">Demand Forecast</h2>
+                <p className="text-sm text-gray-500 truncate">Today's predicted traffic</p>
               </div>
             </div>
-            <span className={`badge ${
+            <span className={`badge flex-shrink-0 ${
               demandForecast?.weeklyTrend === 'increasing' ? 'badge-success' :
               demandForecast?.weeklyTrend === 'decreasing' ? 'badge-error' :
               'badge-gray'
@@ -247,17 +247,17 @@ export function AIInsightsPage() {
 
         {/* Pricing Recommendation */}
         <div className="card">
-          <div className="card-header flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+          <div className="card-header flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
                 <DollarSign className="w-5 h-5 text-green-600" />
               </div>
-              <div>
-                <h2 className="font-bold text-gray-900">Pricing Optimization</h2>
-                <p className="text-sm text-gray-500">AI-recommended deal pricing</p>
+              <div className="min-w-0">
+                <h2 className="font-bold text-gray-900 truncate">Pricing Optimization</h2>
+                <p className="text-sm text-gray-500 truncate">AI-recommended deal pricing</p>
               </div>
             </div>
-            <span className="badge badge-success">
+            <span className="badge badge-success flex-shrink-0">
               {Math.round((pricingRec?.confidence || 0) * 100)}% confident
             </span>
           </div>
@@ -312,14 +312,14 @@ export function AIInsightsPage() {
 
       {/* Customer Segments */}
       <div className="card">
-        <div className="card-header flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+        <div className="card-header flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
               <Users className="w-5 h-5 text-purple-600" />
             </div>
-            <div>
-              <h2 className="font-bold text-gray-900">Customer Segments</h2>
-              <p className="text-sm text-gray-500">AI-identified customer groups</p>
+            <div className="min-w-0">
+              <h2 className="font-bold text-gray-900 truncate">Customer Segments</h2>
+              <p className="text-sm text-gray-500 truncate">AI-identified customer groups</p>
             </div>
           </div>
         </div>
@@ -330,21 +330,21 @@ export function AIInsightsPage() {
                 key={segment.segmentId}
                 className="p-4 border border-gray-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all cursor-pointer"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-bold text-gray-900">{segment.name}</h3>
-                    <p className="text-sm text-gray-500">{segment.size} customers</p>
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-bold text-gray-900 truncate">{segment.name}</h3>
+                    <p className="text-sm text-gray-500 truncate">{segment.size} customers</p>
                   </div>
-                  <span className={`badge ${
+                  <span className={`badge flex-shrink-0 text-xs ${
                     segment.characteristics.churnRisk > 0.5 ? 'badge-error' :
                     segment.characteristics.churnRisk > 0.3 ? 'badge-warning' :
                     'badge-success'
                   }`}>
-                    {Math.round(segment.characteristics.churnRisk * 100)}% churn risk
+                    {Math.round(segment.characteristics.churnRisk * 100)}% churn
                   </span>
                 </div>
 
-                <p className="text-sm text-gray-600 mb-4">{segment.description}</p>
+                <p className="text-sm text-gray-600 mb-4 line-clamp-2">{segment.description}</p>
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
@@ -375,14 +375,14 @@ export function AIInsightsPage() {
 
       {/* Trending Deals */}
       <div className="card">
-        <div className="card-header flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+        <div className="card-header flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
               <TrendingUp className="w-5 h-5 text-amber-600" />
             </div>
-            <div>
-              <h2 className="font-bold text-gray-900">Deal Popularity Scores</h2>
-              <p className="text-sm text-gray-500">Real-time AI ranking</p>
+            <div className="min-w-0">
+              <h2 className="font-bold text-gray-900 truncate">Deal Popularity Scores</h2>
+              <p className="text-sm text-gray-500 truncate">Real-time AI ranking</p>
             </div>
           </div>
         </div>
@@ -393,7 +393,7 @@ export function AIInsightsPage() {
                 key={deal.dealId}
                 className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white ${
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white flex-shrink-0 ${
                   index === 0 ? 'bg-amber-500' :
                   index === 1 ? 'bg-gray-400' :
                   index === 2 ? 'bg-amber-700' :
@@ -402,11 +402,11 @@ export function AIInsightsPage() {
                   #{index + 1}
                 </div>
 
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900">{deal.dealId}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-semibold text-gray-900 truncate">{deal.dealId}</span>
                     {deal.badges.map((badge) => (
-                      <span key={badge} className={`badge text-xs ${
+                      <span key={badge} className={`badge text-xs flex-shrink-0 ${
                         badge === 'hot' ? 'badge-error' :
                         badge === 'trending' ? 'badge-warning' :
                         badge === 'popular' ? 'badge-success' :
@@ -417,18 +417,18 @@ export function AIInsightsPage() {
                       </span>
                     ))}
                   </div>
-                  <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                    <span>Score: {deal.overallScore}</span>
-                    <span>Trending: {deal.trendingScore}</span>
-                    <span>Velocity: {deal.velocityScore}</span>
+                  <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 flex-wrap">
+                    <span className="truncate">Score: {deal.overallScore}</span>
+                    <span className="truncate hidden sm:inline">Trending: {deal.trendingScore}</span>
+                    <span className="truncate hidden sm:inline">Velocity: {deal.velocityScore}</span>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-primary-600">
+                <div className="text-right flex-shrink-0">
+                  <div className="text-xl sm:text-2xl font-bold text-primary-600">
                     {deal.overallScore}
                   </div>
-                  <div className="text-xs text-gray-500">popularity score</div>
+                  <div className="text-xs text-gray-500 truncate">popularity</div>
                 </div>
               </div>
             ))}
@@ -440,12 +440,12 @@ export function AIInsightsPage() {
       <div className="card">
         <div className="card-header">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
               <Brain className="w-5 h-5 text-gray-600" />
             </div>
-            <div>
-              <h2 className="font-bold text-gray-900">Active AI Models</h2>
-              <p className="text-sm text-gray-500">{aiSummary?.activeModels || 0} models running</p>
+            <div className="min-w-0">
+              <h2 className="font-bold text-gray-900 truncate">Active AI Models</h2>
+              <p className="text-sm text-gray-500 truncate">{aiSummary?.activeModels || 0} models running</p>
             </div>
           </div>
         </div>
@@ -460,11 +460,11 @@ export function AIInsightsPage() {
               { name: 'Popularity Scoring', type: 'Multi-factor Ranking', accuracy: 88 },
             ].map((model) => (
               <div key={model.name} className="p-4 border border-gray-200 rounded-xl">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold text-gray-900">{model.name}</h3>
-                  <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <h3 className="font-semibold text-gray-900 truncate">{model.name}</h3>
+                  <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse flex-shrink-0" />
                 </div>
-                <p className="text-sm text-gray-500 mb-3">{model.type}</p>
+                <p className="text-sm text-gray-500 mb-3 truncate">{model.type}</p>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
@@ -472,7 +472,7 @@ export function AIInsightsPage() {
                       style={{ width: `${model.accuracy}%` }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{model.accuracy}%</span>
+                  <span className="text-sm font-medium text-gray-700 flex-shrink-0">{model.accuracy}%</span>
                 </div>
               </div>
             ))}
