@@ -41,6 +41,7 @@ export default {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'shimmer': 'shimmer 2s linear infinite',
         'slide-up': 'slideUp 0.5s ease-out',
+        'bounce-slow': 'bounceSlow 3s ease-in-out infinite',
       },
       keyframes: {
         float: {
@@ -54,6 +55,10 @@ export default {
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        bounceSlow: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-8px)' },
         },
       },
       boxShadow: {

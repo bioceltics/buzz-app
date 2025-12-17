@@ -167,96 +167,233 @@ function HeroSection() {
             </div>
           </div>
 
-          {/* Right Content - Phone Mockup */}
+          {/* Right Content - Photorealistic Phone Mockup */}
           <div className="relative flex justify-center lg:justify-end">
             <div className="relative">
-              {/* Phone Frame */}
-              <div className="w-72 h-[580px] bg-gray-900 rounded-[3rem] p-3 shadow-2xl animate-float">
-                <div className="w-full h-full bg-gray-50 rounded-[2.5rem] overflow-hidden">
-                  {/* App Header */}
-                  <div className="p-4 bg-white border-b border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">B</span>
-                        </div>
-                        <span className="font-bold text-gray-900">Buzz</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                          <Bell className="w-4 h-4 text-gray-600" />
+              {/* Phone Shadow */}
+              <div className="absolute inset-0 translate-x-4 translate-y-4 bg-black/20 rounded-[3.5rem] blur-2xl" />
+
+              {/* Phone Frame - iPhone 15 Pro Style */}
+              <div className="relative w-[280px] h-[580px] animate-float">
+                {/* Titanium Frame */}
+                <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 p-[3px]">
+                  {/* Inner Frame with Brushed Metal Effect */}
+                  <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-b from-gray-600 via-gray-800 to-gray-900 opacity-50" />
+                </div>
+
+                {/* Side Buttons - Left */}
+                <div className="absolute -left-[2px] top-28 w-[3px] h-8 bg-gray-700 rounded-l-sm" /> {/* Silent Switch */}
+                <div className="absolute -left-[2px] top-44 w-[3px] h-12 bg-gray-700 rounded-l-sm" /> {/* Volume Up */}
+                <div className="absolute -left-[2px] top-60 w-[3px] h-12 bg-gray-700 rounded-l-sm" /> {/* Volume Down */}
+
+                {/* Side Button - Right */}
+                <div className="absolute -right-[2px] top-40 w-[3px] h-16 bg-gray-700 rounded-r-sm" /> {/* Power */}
+
+                {/* Screen Container */}
+                <div className="absolute inset-[3px] rounded-[3.2rem] bg-black overflow-hidden">
+                  {/* Screen */}
+                  <div className="absolute inset-[2px] rounded-[3rem] bg-gray-50 overflow-hidden">
+                    {/* Dynamic Island */}
+                    <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[100px] h-[32px] bg-black rounded-full z-20 flex items-center justify-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-gray-800 ring-1 ring-gray-700" /> {/* Camera */}
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-700" /> {/* Sensor */}
+                    </div>
+
+                    {/* Status Bar */}
+                    <div className="absolute top-0 left-0 right-0 h-12 bg-white z-10 flex items-end justify-between px-6 pb-1">
+                      <span className="text-xs font-semibold text-gray-900">9:41</span>
+                      <div className="flex items-center gap-1">
+                        <svg className="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 3C8.5 3 5.5 4.5 3.5 7L12 21l8.5-14C18.5 4.5 15.5 3 12 3z"/>
+                        </svg>
+                        <svg className="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M2 9h3v12H2V9zm5-4h3v16H7V5zm5 8h3v8h-3v-8zm5-4h3v12h-3V9z"/>
+                        </svg>
+                        <div className="flex items-center">
+                          <div className="w-6 h-3 rounded-sm border border-gray-900 relative">
+                            <div className="absolute inset-[2px] bg-gray-900 rounded-[1px]" style={{width: '80%'}} />
+                          </div>
+                          <div className="w-0.5 h-1.5 bg-gray-900 rounded-r-sm" />
                         </div>
                       </div>
                     </div>
-                  </div>
-                  {/* Mock Deal Cards */}
-                  <div className="p-4 space-y-3">
-                    <div className="bg-white rounded-2xl p-4 shadow-card border-l-4 border-l-green-500">
-                      <div className="flex items-start gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-orange-500 flex items-center justify-center">
-                          <span className="text-white text-lg">🍹</span>
+
+                    {/* App Content */}
+                    <div className="absolute inset-0 top-12 bg-gray-50">
+                      {/* App Header */}
+                      <div className="p-4 bg-white border-b border-gray-100">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-9 h-9 rounded-xl bg-primary-500 flex items-center justify-center shadow-lg shadow-primary-500/30">
+                              <span className="text-white font-bold text-sm">B</span>
+                            </div>
+                            <div>
+                              <span className="font-bold text-gray-900">Buzz</span>
+                              <span className="ml-1.5 px-1.5 py-0.5 bg-primary-100 text-primary-700 text-[8px] font-bold rounded">BETA</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center relative">
+                              <Bell className="w-4 h-4 text-gray-600" />
+                              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-primary-500 rounded-full border-2 border-white" />
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <div className="text-sm font-semibold text-gray-900">2-for-1 Cocktails</div>
-                          <div className="text-xs text-gray-500">The Velvet Lounge</div>
-                          <div className="mt-2 flex items-center gap-2">
+                      </div>
+
+                      {/* Live Deals Header */}
+                      <div className="px-4 pt-4 pb-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-gray-900">Live Deals</span>
                             <span className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                              LIVE NOW
+                              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                              3 Active
                             </span>
-                            <span className="text-[10px] text-gray-400">Ends 8PM</span>
+                          </div>
+                          <span className="text-xs text-primary-500 font-semibold">See All</span>
+                        </div>
+                      </div>
+
+                      {/* Mock Deal Cards */}
+                      <div className="px-4 space-y-3">
+                        <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 border-l-4 border-l-green-500">
+                          <div className="flex items-start gap-3">
+                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg">
+                              <span className="text-2xl">🍹</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-bold text-gray-900">2-for-1 Cocktails</div>
+                              <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <span className="w-1 h-1 bg-gray-400 rounded-full" />
+                                The Velvet Lounge
+                              </div>
+                              <div className="mt-2 flex items-center gap-2">
+                                <span className="px-2 py-0.5 bg-green-500 text-white text-[9px] font-bold rounded-full flex items-center gap-1">
+                                  <span className="w-1 h-1 bg-white rounded-full animate-pulse" />
+                                  LIVE
+                                </span>
+                                <span className="text-[10px] text-gray-500">Ends 8PM</span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs text-gray-400">Save</div>
+                              <div className="text-sm font-bold text-green-600">$15</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 border-l-4 border-l-green-500">
+                          <div className="flex items-start gap-3">
+                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg">
+                              <span className="text-2xl">🍕</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-bold text-gray-900">50% Off Appetizers</div>
+                              <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <span className="w-1 h-1 bg-gray-400 rounded-full" />
+                                Urban Kitchen
+                              </div>
+                              <div className="mt-2 flex items-center gap-2">
+                                <span className="px-2 py-0.5 bg-green-500 text-white text-[9px] font-bold rounded-full flex items-center gap-1">
+                                  <span className="w-1 h-1 bg-white rounded-full animate-pulse" />
+                                  LIVE
+                                </span>
+                                <span className="text-[10px] text-red-500 font-semibold">1hr left!</span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs text-gray-400">Save</div>
+                              <div className="text-sm font-bold text-green-600">$12</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 border-l-4 border-l-amber-400">
+                          <div className="flex items-start gap-3">
+                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg">
+                              <span className="text-2xl">🎉</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-bold text-gray-900">Free Entry + Drink</div>
+                              <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <span className="w-1 h-1 bg-gray-400 rounded-full" />
+                                Club Neon
+                              </div>
+                              <div className="mt-2 flex items-center gap-2">
+                                <span className="px-2 py-0.5 bg-amber-500 text-white text-[9px] font-bold rounded-full">
+                                  STARTS 9PM
+                                </span>
+                                <span className="text-[10px] text-gray-500">Today only</span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs text-gray-400">Save</div>
+                              <div className="text-sm font-bold text-green-600">$25</div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-4 shadow-card border-l-4 border-l-green-500">
-                      <div className="flex items-start gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center">
-                          <span className="text-white text-lg">🍕</span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-sm font-semibold text-gray-900">50% Off Appetizers</div>
-                          <div className="text-xs text-gray-500">Urban Kitchen</div>
-                          <div className="mt-2 flex items-center gap-2">
-                            <span className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                              LIVE NOW
-                            </span>
-                            <span className="text-[10px] text-red-500 font-medium">1hr left!</span>
+
+                      {/* Bottom Navigation */}
+                      <div className="absolute bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-100 flex items-center justify-around px-6">
+                        <div className="flex flex-col items-center gap-1">
+                          <div className="w-6 h-6 rounded-lg bg-primary-500 flex items-center justify-center">
+                            <Zap className="w-3.5 h-3.5 text-white" />
                           </div>
+                          <span className="text-[9px] font-semibold text-primary-500">Deals</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1 opacity-50">
+                          <div className="w-6 h-6 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                          </div>
+                          <span className="text-[9px] font-medium text-gray-400">Explore</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1 opacity-50">
+                          <div className="w-6 h-6 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                          </div>
+                          <span className="text-[9px] font-medium text-gray-400">Saved</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1 opacity-50">
+                          <div className="w-6 h-6 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <span className="text-[9px] font-medium text-gray-400">Profile</span>
                         </div>
                       </div>
+
+                      {/* Home Indicator */}
+                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-900 rounded-full" />
                     </div>
-                    <div className="bg-white rounded-2xl p-4 shadow-card border-l-4 border-l-amber-400">
-                      <div className="flex items-start gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center">
-                          <span className="text-white text-lg">🎉</span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-sm font-semibold text-gray-900">Free Entry + Drink</div>
-                          <div className="text-xs text-gray-500">Club Neon</div>
-                          <div className="mt-2 flex items-center gap-2">
-                            <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-semibold rounded-full">
-                              STARTS 9PM
-                            </span>
-                            <span className="text-[10px] text-gray-400">Today only</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+
+                    {/* Screen Reflection Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none rounded-[3rem]" />
                   </div>
                 </div>
               </div>
 
-              {/* Floating badge */}
-              <div className="absolute -top-4 -right-4 px-4 py-2 bg-white rounded-xl shadow-xl border border-gray-100 flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <Check className="w-4 h-4 text-green-600" />
+              {/* Floating Notification Badge */}
+              <div className="absolute -top-6 -right-6 px-4 py-3 bg-white rounded-2xl shadow-2xl border border-gray-100 flex items-center gap-3 animate-bounce-slow">
+                <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/30">
+                  <Check className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500">Deal Claimed!</div>
-                  <div className="text-sm font-semibold text-gray-900">$12 saved</div>
+                  <div className="text-xs text-gray-500 font-medium">Deal Claimed!</div>
+                  <div className="text-base font-bold text-gray-900">$12 saved</div>
                 </div>
+              </div>
+
+              {/* Secondary floating element */}
+              <div className="absolute -bottom-4 -left-8 px-3 py-2 bg-primary-500 rounded-xl shadow-xl shadow-primary-500/30 flex items-center gap-2 text-white">
+                <Bell className="w-4 h-4" />
+                <span className="text-xs font-semibold">New deal nearby!</span>
               </div>
             </div>
           </div>
