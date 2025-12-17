@@ -2,8 +2,19 @@ import { Router } from 'express';
 import { authMiddleware, venueOwnerMiddleware, AuthRequest } from '../middleware/auth.js';
 import { supabaseAdmin } from '../lib/supabase.js';
 import QRCode from 'qrcode';
+import crypto from 'crypto';
 
 const router = Router();
+
+// Generate a secure redemption code
+function generateRedemptionCode(): string {
+  return crypto.randomBytes(16).toString('hex').toUpperCase();
+}
+
+// Validate redemption code format
+function isValidRedemptionCode(code: string): boolean {
+  return /^[A-F0-9]{32}$/.test(code);
+}
 
 // Get active deals with filters
 router.get('/', async (req, res) => {
@@ -70,7 +81,246 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Redeem a deal
+// Generate QR code for a deal (user requests to redeem)
+router.post('/:id/generate-qr', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get the deal
+    const { data: deal, error: dealError } = await supabaseAdmin
+      .from('deals')
+      .select('*, venue:venues(id, name)')
+      .eq('id', id)
+      .single();
+
+    if (dealError || !deal) {
+      return res.status(404).json({ error: 'Deal not found' });
+    }
+
+    // Check if deal is active
+    const now = new Date();
+    if (!deal.is_active || new Date(deal.end_time) < now || new Date(deal.start_time) > now) {
+      return res.status(400).json({ error: 'Deal is not currently active' });
+    }
+
+    // Check if max redemptions reached
+    if (deal.max_redemptions && deal.redemption_count >= deal.max_redemptions) {
+      return res.status(400).json({ error: 'Deal has reached maximum redemptions' });
+    }
+
+    // Check if user already redeemed today (for daily limits)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const { data: existingToday } = await supabaseAdmin
+      .from('redemptions')
+      .select('id')
+      .eq('user_id', req.user!.id)
+      .eq('deal_id', id)
+      .gte('redeemed_at', today.toISOString())
+      .single();
+
+    if (existingToday) {
+      return res.status(400).json({ error: 'You have already redeemed this deal today' });
+    }
+
+    // Generate a unique redemption code for this user/deal
+    const redemptionCode = generateRedemptionCode();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes expiry
+
+    // Store pending redemption
+    const { data: pendingRedemption, error: pendingError } = await supabaseAdmin
+      .from('pending_redemptions')
+      .insert({
+        user_id: req.user!.id,
+        deal_id: id,
+        venue_id: deal.venue_id,
+        redemption_code: redemptionCode,
+        expires_at: expiresAt.toISOString(),
+      })
+      .select()
+      .single();
+
+    if (pendingError) {
+      // If table doesn't exist, create inline redemption
+      console.log('Pending redemptions table may not exist, using direct QR');
+    }
+
+    // Generate QR code with redemption data
+    const qrData = JSON.stringify({
+      type: 'buzz_deal',
+      dealId: id,
+      venueId: deal.venue_id,
+      userId: req.user!.id,
+      code: redemptionCode,
+      expiresAt: expiresAt.toISOString(),
+    });
+
+    const qrCodeDataUrl = await QRCode.toDataURL(qrData, {
+      width: 300,
+      margin: 2,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF',
+      },
+    });
+
+    res.json({
+      qrCode: qrCodeDataUrl,
+      redemptionCode,
+      expiresAt: expiresAt.toISOString(),
+      deal: {
+        id: deal.id,
+        title: deal.title,
+        venue: deal.venue,
+      },
+    });
+  } catch (error) {
+    console.error('Generate QR error:', error);
+    res.status(500).json({ error: 'Failed to generate QR code' });
+  }
+});
+
+// Verify and complete deal redemption (venue scans QR code)
+router.post('/:id/verify', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const { id } = req.params;
+    const { redemptionCode, userId } = req.body;
+
+    if (!redemptionCode) {
+      return res.status(400).json({ error: 'Redemption code is required' });
+    }
+
+    // Get the deal and verify venue ownership
+    const { data: deal, error: dealError } = await supabaseAdmin
+      .from('deals')
+      .select('*, venue:venues(*)')
+      .eq('id', id)
+      .single();
+
+    if (dealError || !deal) {
+      return res.status(404).json({ error: 'Deal not found' });
+    }
+
+    // Check if user is venue owner or staff
+    const isVenueOwner = deal.venue.owner_id === req.user!.id;
+    const isAdmin = req.user?.role === 'admin';
+
+    // TODO: Add staff verification when staff table is implemented
+    if (!isVenueOwner && !isAdmin) {
+      return res.status(403).json({ error: 'Not authorized to verify redemptions for this venue' });
+    }
+
+    // Check if deal is active
+    const now = new Date();
+    if (!deal.is_active || new Date(deal.end_time) < now || new Date(deal.start_time) > now) {
+      return res.status(400).json({ error: 'Deal is not currently active', status: 'expired' });
+    }
+
+    // Check if max redemptions reached
+    if (deal.max_redemptions && deal.redemption_count >= deal.max_redemptions) {
+      return res.status(400).json({ error: 'Deal has reached maximum redemptions', status: 'limit_reached' });
+    }
+
+    // Verify the redemption code (check pending_redemptions if exists)
+    const { data: pendingRedemption } = await supabaseAdmin
+      .from('pending_redemptions')
+      .select('*')
+      .eq('deal_id', id)
+      .eq('redemption_code', redemptionCode)
+      .eq('used', false)
+      .single();
+
+    let redeemerUserId = userId;
+
+    if (pendingRedemption) {
+      // Check if expired
+      if (new Date(pendingRedemption.expires_at) < now) {
+        return res.status(400).json({ error: 'Redemption code has expired', status: 'code_expired' });
+      }
+      redeemerUserId = pendingRedemption.user_id;
+
+      // Mark pending redemption as used
+      await supabaseAdmin
+        .from('pending_redemptions')
+        .update({ used: true })
+        .eq('id', pendingRedemption.id);
+    }
+
+    if (!redeemerUserId) {
+      return res.status(400).json({ error: 'Invalid redemption code', status: 'invalid_code' });
+    }
+
+    // Check if user already redeemed today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const { data: existingRedemption } = await supabaseAdmin
+      .from('redemptions')
+      .select('id')
+      .eq('user_id', redeemerUserId)
+      .eq('deal_id', id)
+      .gte('redeemed_at', today.toISOString())
+      .single();
+
+    if (existingRedemption) {
+      return res.status(400).json({ error: 'User has already redeemed this deal today', status: 'already_redeemed' });
+    }
+
+    // Create the redemption record
+    const { data: redemption, error: redemptionError } = await supabaseAdmin
+      .from('redemptions')
+      .insert({
+        user_id: redeemerUserId,
+        deal_id: id,
+        venue_id: deal.venue_id,
+        verified_by: req.user!.id,
+        redemption_code: redemptionCode,
+      })
+      .select()
+      .single();
+
+    if (redemptionError) throw redemptionError;
+
+    // Increment redemption count
+    await supabaseAdmin
+      .from('deals')
+      .update({ redemption_count: (deal.redemption_count || 0) + 1 })
+      .eq('id', id);
+
+    // Get user details for confirmation
+    const { data: redeemer } = await supabaseAdmin
+      .from('users')
+      .select('id, full_name, email')
+      .eq('id', redeemerUserId)
+      .single();
+
+    res.json({
+      success: true,
+      status: 'verified',
+      message: 'Deal redeemed successfully!',
+      redemption: {
+        id: redemption.id,
+        deal: {
+          id: deal.id,
+          title: deal.title,
+          discount_type: deal.discount_type,
+          discount_value: deal.discount_value,
+        },
+        user: redeemer ? {
+          name: redeemer.full_name,
+          email: redeemer.email,
+        } : null,
+        redeemed_at: redemption.redeemed_at,
+      },
+    });
+  } catch (error) {
+    console.error('Verify redemption error:', error);
+    res.status(500).json({ error: 'Failed to verify redemption' });
+  }
+});
+
+// Redeem a deal (legacy endpoint - direct redemption without QR)
 router.post('/:id/redeem', authMiddleware, async (req: AuthRequest, res) => {
   try {
     const { id } = req.params;
@@ -97,25 +347,31 @@ router.post('/:id/redeem', authMiddleware, async (req: AuthRequest, res) => {
       return res.status(400).json({ error: 'Deal has reached maximum redemptions' });
     }
 
-    // Check if user already redeemed
+    // Check if user already redeemed today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const { data: existing } = await supabaseAdmin
       .from('redemptions')
       .select('id')
       .eq('user_id', req.user!.id)
       .eq('deal_id', id)
+      .gte('redeemed_at', today.toISOString())
       .single();
 
     if (existing) {
-      return res.status(400).json({ error: 'You have already redeemed this deal' });
+      return res.status(400).json({ error: 'You have already redeemed this deal today' });
     }
 
     // Create redemption
+    const redemptionCode = generateRedemptionCode();
     const { data: redemption, error: redemptionError } = await supabaseAdmin
       .from('redemptions')
       .insert({
         user_id: req.user!.id,
         deal_id: id,
         venue_id: deal.venue_id,
+        redemption_code: redemptionCode,
       })
       .select()
       .single();
@@ -125,7 +381,7 @@ router.post('/:id/redeem', authMiddleware, async (req: AuthRequest, res) => {
     // Increment redemption count
     await supabaseAdmin
       .from('deals')
-      .update({ redemption_count: deal.redemption_count + 1 })
+      .update({ redemption_count: (deal.redemption_count || 0) + 1 })
       .eq('id', id);
 
     res.json({ redemption, message: 'Deal redeemed successfully!' });

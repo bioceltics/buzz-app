@@ -14,6 +14,8 @@ import reviewRoutes from './routes/reviews.js';
 import favoriteRoutes from './routes/favorites.js';
 import chatRoutes from './routes/chat.js';
 import adminRoutes from './routes/admin.js';
+import aiRoutes from './routes/ai.js';
+import billingRoutes from './routes/billing.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -52,6 +54,8 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/billing', billingRoutes);
 
 // 404 handler
 app.use((req, res) => {
