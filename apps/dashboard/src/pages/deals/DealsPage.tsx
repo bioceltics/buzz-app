@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Edit, Trash2, Eye, Pause, Play, StopCircle, Clock, Users } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Eye, Pause, Play, StopCircle, Clock, Users, QrCode } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function DealsPage() {
@@ -109,10 +109,16 @@ export function DealsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Deals</h1>
           <p className="text-gray-600">Manage your promotions and special offers</p>
         </div>
-        <Link to="/deals/new" className="btn btn-primary">
-          <Plus className="w-5 h-5 mr-2" />
-          Create Deal
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link to="/deals/scanner" className="btn btn-secondary">
+            <QrCode className="w-5 h-5 mr-2" />
+            Scan QR
+          </Link>
+          <Link to="/deals/new" className="btn btn-primary">
+            <Plus className="w-5 h-5 mr-2" />
+            Create Deal
+          </Link>
+        </div>
       </div>
 
       {/* Search and Filters */}

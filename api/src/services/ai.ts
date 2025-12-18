@@ -1,5 +1,5 @@
 /**
- * AI Service - Powered by Anthropic's Claude API
+ * AI Service - Powered by Groq API
  *
  * This service provides AI-powered features for the Buzz platform:
  * - Deal content generation
@@ -9,15 +9,15 @@
  * - Customer insights
  */
 
-import Anthropic from '@anthropic-ai/sdk';
+import Groq from 'groq-sdk';
 
-// Initialize Claude client
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
+// Initialize Groq client
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY || '',
 });
 
-const AI_MODEL = 'claude-3-haiku-20240307'; // Fast and cost-effective for production
-const AI_MODEL_ADVANCED = 'claude-sonnet-4-20250514'; // For complex analysis
+const AI_MODEL = 'mixtral-8x7b-32768'; // Fast and cost-effective for production
+const AI_MODEL_ADVANCED = 'llama-3.1-70b-versatile'; // For complex analysis
 
 // ============================================================================
 // TYPES
@@ -75,9 +75,9 @@ class AIService {
   private isConfigured: boolean;
 
   constructor() {
-    this.isConfigured = !!process.env.ANTHROPIC_API_KEY;
+    this.isConfigured = !!process.env.GROQ_API_KEY;
     if (!this.isConfigured) {
-      console.warn('ANTHROPIC_API_KEY not configured. AI features will use fallback responses.');
+      console.warn('GROQ_API_KEY not configured. AI features will use fallback responses.');
     }
   }
 
@@ -92,7 +92,7 @@ class AIService {
     try {
       const prompt = this.buildContentPrompt(input);
 
-      const response = await anthropic.messages.create({
+      const response = await groq.chat.completions.create({
         model: AI_MODEL,
         max_tokens: 1024,
         messages: [
@@ -103,12 +103,12 @@ class AIService {
         ],
       });
 
-      const textContent = response.content[0];
-      if (textContent.type !== 'text') {
-        throw new Error('Unexpected response type');
+      const textContent = response.choices[0]?.message?.content;
+      if (!textContent) {
+        throw new Error('No response from AI');
       }
 
-      return this.parseContentResponse(textContent.text);
+      return this.parseContentResponse(textContent);
     } catch (error) {
       console.error('AI content generation error:', error);
       return this.getFallbackContent(input);
@@ -139,18 +139,18 @@ Return JSON array with objects containing: hour (0-23), predictedTraffic (0-100)
 
 Only return valid JSON, no other text.`;
 
-      const response = await anthropic.messages.create({
+      const response = await groq.chat.completions.create({
         model: AI_MODEL,
         max_tokens: 1500,
         messages: [{ role: 'user', content: prompt }],
       });
 
-      const textContent = response.content[0];
-      if (textContent.type !== 'text') {
-        throw new Error('Unexpected response type');
+      const textContent = response.choices[0]?.message?.content;
+      if (!textContent) {
+        throw new Error('No response from AI');
       }
 
-      return JSON.parse(textContent.text);
+      return JSON.parse(textContent);
     } catch (error) {
       console.error('AI demand prediction error:', error);
       return this.getFallbackDemandPredictions(venueType);
@@ -187,18 +187,18 @@ Return JSON with:
 
 Only return valid JSON, no other text.`;
 
-      const response = await anthropic.messages.create({
+      const response = await groq.chat.completions.create({
         model: AI_MODEL,
         max_tokens: 500,
         messages: [{ role: 'user', content: prompt }],
       });
 
-      const textContent = response.content[0];
-      if (textContent.type !== 'text') {
-        throw new Error('Unexpected response type');
+      const textContent = response.choices[0]?.message?.content;
+      if (!textContent) {
+        throw new Error('No response from AI');
       }
 
-      return JSON.parse(textContent.text);
+      return JSON.parse(textContent);
     } catch (error) {
       console.error('AI pricing optimization error:', error);
       return this.getFallbackPricingRecommendation(dealType, category);
@@ -230,18 +230,18 @@ For each segment, provide:
 
 Return as JSON array. Only return valid JSON, no other text.`;
 
-      const response = await anthropic.messages.create({
+      const response = await groq.chat.completions.create({
         model: AI_MODEL,
         max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }],
       });
 
-      const textContent = response.content[0];
-      if (textContent.type !== 'text') {
-        throw new Error('Unexpected response type');
+      const textContent = response.choices[0]?.message?.content;
+      if (!textContent) {
+        throw new Error('No response from AI');
       }
 
-      return JSON.parse(textContent.text);
+      return JSON.parse(textContent);
     } catch (error) {
       console.error('AI customer analysis error:', error);
       return this.getFallbackCustomerInsights(venueType);
@@ -277,18 +277,18 @@ Available deals: ${JSON.stringify(dealSummaries)}
 Return JSON array of deal IDs ranked by relevance. Top 5 only.
 Only return valid JSON array of strings, no other text.`;
 
-      const response = await anthropic.messages.create({
+      const response = await groq.chat.completions.create({
         model: AI_MODEL,
         max_tokens: 200,
         messages: [{ role: 'user', content: prompt }],
       });
 
-      const textContent = response.content[0];
-      if (textContent.type !== 'text') {
-        throw new Error('Unexpected response type');
+      const textContent = response.choices[0]?.message?.content;
+      if (!textContent) {
+        throw new Error('No response from AI');
       }
 
-      return JSON.parse(textContent.text);
+      return JSON.parse(textContent);
     } catch (error) {
       console.error('AI recommendation error:', error);
       return availableDeals.slice(0, 5).map((d) => d.id);

@@ -18,6 +18,7 @@ import { DashboardPage } from '@/pages/dashboard/DashboardPage';
 import { DealsPage } from '@/pages/deals/DealsPage';
 import { CreateDealPage } from '@/pages/deals/CreateDealPage';
 import { EditDealPage } from '@/pages/deals/EditDealPage';
+import { ScannerPage } from '@/pages/deals/ScannerPage';
 import { EventsPage } from '@/pages/events/EventsPage';
 import { CreateEventPage } from '@/pages/events/CreateEventPage';
 import { AnalyticsPage } from '@/pages/analytics/AnalyticsPage';
@@ -99,6 +100,7 @@ export default function App() {
         <Route path="/deals" element={<DealsPage />} />
         <Route path="/deals/new" element={<CreateDealPage />} />
         <Route path="/deals/:id/edit" element={<EditDealPage />} />
+        <Route path="/deals/scanner" element={<ScannerPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/events/new" element={<CreateEventPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
