@@ -126,7 +126,7 @@ export default function SignUpScreen() {
             </View>
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>
-              Join Buzzer to discover amazing deals near you
+              Join Buzzee to discover amazing deals near you
             </Text>
           </View>
 

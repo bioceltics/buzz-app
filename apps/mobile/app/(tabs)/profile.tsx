@@ -10,10 +10,13 @@ import {
   Switch,
   Alert,
   StatusBar,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/services/supabase';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 import { Button } from '@/components/ui';
 
@@ -21,11 +24,34 @@ export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
 
+  // Check if user is a venue owner
+  const { data: venue } = useQuery({
+    queryKey: ['user-venue', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data } = await supabase
+        .from('venues')
+        .select('id, name')
+        .eq('owner_id', user.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const isVenueOwner = !!venue;
+
   const handleSignOut = () => {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: signOut },
-    ]);
+    if (Platform.OS === 'web') {
+      if (window.confirm('Are you sure you want to sign out?')) {
+        signOut();
+      }
+    } else {
+      Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Sign Out', style: 'destructive', onPress: signOut },
+      ]);
+    }
   };
 
   if (!user) {
@@ -39,7 +65,7 @@ export default function ProfileScreen() {
           <View style={styles.welcomeIconContainer}>
             <Ionicons name="person" size={40} color={COLORS.primary} />
           </View>
-          <Text style={styles.signInTitle}>Welcome to Buzz</Text>
+          <Text style={styles.signInTitle}>Welcome to Buzzee</Text>
           <Text style={styles.signInSubtext}>
             Sign in to save favorites, chat with venues, and redeem exclusive deals
           </Text>
@@ -84,7 +110,7 @@ export default function ProfileScreen() {
               </View>
             </View>
             <Text style={styles.userName}>
-              {user.user_metadata?.full_name || 'Buzz User'}
+              {user.user_metadata?.full_name || 'Buzzee User'}
             </Text>
             <Text style={styles.userEmail}>{user.email || user.phone}</Text>
             <TouchableOpacity
@@ -222,6 +248,38 @@ export default function ProfileScreen() {
             />
           </View>
         </View>
+
+        {/* Venue Owner Section */}
+        {isVenueOwner && (
+          <View style={styles.menuSection}>
+            <Text style={styles.menuSectionTitle}>Business</Text>
+            <TouchableOpacity
+              style={styles.venueButton}
+              onPress={() => {
+                if (Platform.OS === 'web') {
+                  window.alert('Use the Buzzee for Business app to manage your venue.');
+                } else {
+                  Alert.alert(
+                    'Buzzee for Business',
+                    'Use the Buzzee for Business app to manage your venue, create deals, and scan redemptions.',
+                    [{ text: 'OK' }]
+                  );
+                }
+              }}
+            >
+              <View style={styles.venueButtonContent}>
+                <View style={[styles.menuIconContainer, { backgroundColor: COLORS.primaryLighter }]}>
+                  <Ionicons name="business" size={20} color={COLORS.primary} />
+                </View>
+                <View style={styles.menuTextContainer}>
+                  <Text style={styles.menuItemTitle}>Buzzee for Business</Text>
+                  <Text style={styles.menuItemSubtitle}>Manage {venue?.name}</Text>
+                </View>
+              </View>
+              <Ionicons name="open-outline" size={20} color={COLORS.primary} />
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Sign Out */}
         <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
@@ -475,6 +533,20 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: COLORS.borderLight,
     marginLeft: SPACING.base + 40 + SPACING.md,
+  },
+  venueButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.white,
+    padding: SPACING.base,
+    borderRadius: RADIUS.lg,
+    ...SHADOWS.sm,
+  },
+  venueButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   signOutButton: {
     flexDirection: 'row',

@@ -111,3 +111,45 @@ export function getTimeUntilEnd(endTime: string): string {
 
   return `${diffMinutes}m left`;
 }
+
+/**
+ * Format time remaining from a date string
+ */
+export function formatTimeRemaining(dateString: string): string {
+  const now = new Date();
+  const target = new Date(dateString);
+  const diffMs = target.getTime() - now.getTime();
+
+  if (diffMs <= 0) return 'Expired';
+
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffDays > 0) {
+    return `${diffDays}d ${diffHours % 24}h remaining`;
+  }
+  if (diffHours > 0) {
+    return `${diffHours}h ${diffMinutes % 60}m remaining`;
+  }
+  if (diffMinutes > 0) {
+    return `${diffMinutes}m ${diffSeconds % 60}s remaining`;
+  }
+  return `${diffSeconds}s remaining`;
+}
+
+/**
+ * Format a date and time together
+ */
+export function formatDateTime(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+}

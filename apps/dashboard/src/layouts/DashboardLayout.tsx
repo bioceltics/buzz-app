@@ -78,10 +78,7 @@ export function DashboardLayout() {
               <span className="text-white font-bold text-xl">B</span>
             </div>
             <div>
-              <span className="text-2xl font-bold text-gray-900">Buzz</span>
-              <span className="ml-2 px-2 py-0.5 bg-primary-100 text-primary-700 text-2xs font-semibold rounded-full">
-                PRO
-              </span>
+              <span className="text-2xl font-bold text-gray-900">Buzzee</span>
             </div>
           </div>
           <button

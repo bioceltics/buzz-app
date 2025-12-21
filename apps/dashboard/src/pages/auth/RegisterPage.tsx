@@ -44,14 +44,14 @@ export function RegisterPage() {
     <div>
       {/* Mobile Logo */}
       <div className="lg:hidden text-center mb-8">
-        <h1 className="text-3xl font-bold text-primary-500">Buzz</h1>
+        <h1 className="text-3xl font-bold text-primary-500">Buzzee</h1>
         <p className="text-gray-500">Venue Dashboard</p>
       </div>
 
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900">Create your account</h2>
         <p className="mt-2 text-gray-600">
-          Start promoting your venue on Buzz
+          Start promoting your venue on Buzzee
         </p>
       </div>
 

@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Buzzer",
-    "slug": "buzzer",
+    "name": "Buzzee",
+    "slug": "buzzing",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "buzzer",
+    "scheme": "buzzing",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
@@ -22,9 +22,9 @@
         "googleMapsApiKey": "YOUR_GOOGLE_MAPS_API_KEY"
       },
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Buzzer needs your location to show nearby deals and venues.",
-        "NSLocationAlwaysUsageDescription": "Buzzer needs your location to notify you about nearby deals.",
-        "NSCameraUsageDescription": "Buzzer needs camera access to scan QR codes for deal redemption.",
+        "NSLocationWhenInUseUsageDescription": "Buzzee needs your location to show nearby deals and venues.",
+        "NSLocationAlwaysUsageDescription": "Buzzee needs your location to notify you about nearby deals.",
+        "NSCameraUsageDescription": "Buzzee needs camera access to scan QR codes for deal redemption.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -60,13 +60,13 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow Buzzer to use your location to find nearby deals."
+          "locationAlwaysAndWhenInUsePermission": "Allow Buzzee to use your location to find nearby deals."
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Buzzer to access your camera."
+          "cameraPermission": "Allow Buzzee to access your camera."
         }
       ]
     ],

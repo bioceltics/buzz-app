@@ -17,8 +17,30 @@ import {
   Sparkles,
   Shield,
   Users,
+  Wine,
+  UtensilsCrossed,
+  PartyPopper,
+  MapPin,
 } from 'lucide-react';
 import { useState } from 'react';
+
+// Custom Buzzee Logo Icon - Simple B letter
+function BuzzeeIcon({ className = "w-6 h-6" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <text
+        x="12"
+        y="17"
+        fontSize="18"
+        fontWeight="bold"
+        fill="white"
+        textAnchor="middle"
+      >
+        B
+      </text>
+    </svg>
+  );
+}
 
 // Navigation Component
 function Navigation() {
@@ -30,10 +52,10 @@ function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center shadow-lg shadow-primary-500/25">
-              <span className="text-white font-bold text-xl">B</span>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-pink-400 flex items-center justify-center shadow-lg shadow-primary-500/25">
+              <BuzzeeIcon className="w-7 h-7" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">Buzz</span>
+            <span className="text-2xl font-bold text-gray-900">Buzzee</span>
           </div>
 
           {/* Desktop Navigation */}
@@ -44,8 +66,8 @@ function Navigation() {
             <a href="#how-it-works" className="text-gray-600 hover:text-primary-500 font-medium transition-colors">
               How It Works
             </a>
-            <a href="#for-venues" className="text-gray-600 hover:text-primary-500 font-medium transition-colors">
-              For Venues
+            <a href="#for-business" className="text-gray-600 hover:text-primary-500 font-medium transition-colors">
+              For Business
             </a>
             <a href="#download" className="text-gray-600 hover:text-primary-500 font-medium transition-colors">
               Download
@@ -55,10 +77,10 @@ function Navigation() {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
             <a
-              href="https://dashboard.buzz.app/login"
+              href="http://localhost:3001/login"
               className="text-gray-700 font-semibold hover:text-primary-500 transition-colors"
             >
-              Venue Login
+              Business Login
             </a>
             <a
               href="#download"
@@ -83,10 +105,10 @@ function Navigation() {
             <div className="flex flex-col gap-4">
               <a href="#features" className="text-gray-600 font-medium py-2 hover:text-primary-500 transition-colors">Features</a>
               <a href="#how-it-works" className="text-gray-600 font-medium py-2 hover:text-primary-500 transition-colors">How It Works</a>
-              <a href="#for-venues" className="text-gray-600 font-medium py-2 hover:text-primary-500 transition-colors">For Venues</a>
+              <a href="#for-business" className="text-gray-600 font-medium py-2 hover:text-primary-500 transition-colors">For Business</a>
               <a href="#download" className="text-gray-600 font-medium py-2 hover:text-primary-500 transition-colors">Download</a>
-              <a href="https://dashboard.buzz.app/login" className="text-primary-500 font-semibold py-2">
-                Venue Login
+              <a href="http://localhost:3001/login" className="text-primary-500 font-semibold py-2">
+                Business Login
               </a>
             </div>
           </div>
@@ -170,24 +192,30 @@ function HeroSection() {
           {/* Right Content - Photorealistic Phone Mockup */}
           <div className="relative flex justify-center lg:justify-end">
             <div className="relative">
-              {/* Phone Shadow */}
-              <div className="absolute inset-0 translate-x-4 translate-y-4 bg-black/20 rounded-[3.5rem] blur-2xl" />
+              {/* Ambient Glow */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-primary-500/20 via-purple-500/20 to-pink-500/20 rounded-[4rem] blur-3xl" />
+
+              {/* Multi-layer Phone Shadow */}
+              <div className="absolute inset-0 translate-x-6 translate-y-8 bg-black/30 rounded-[3.5rem] blur-3xl" />
+              <div className="absolute inset-0 translate-x-3 translate-y-4 bg-black/20 rounded-[3.5rem] blur-2xl" />
 
               {/* Phone Frame - iPhone 15 Pro Style */}
               <div className="relative w-[280px] h-[580px] animate-float">
-                {/* Titanium Frame */}
-                <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 p-[3px]">
+                {/* Titanium Frame - Enhanced with realistic metal gradient */}
+                <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-b from-gray-400 via-gray-600 to-gray-800 p-[3px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4),0_0_40px_rgba(139,92,246,0.1)]">
                   {/* Inner Frame with Brushed Metal Effect */}
-                  <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-b from-gray-600 via-gray-800 to-gray-900 opacity-50" />
+                  <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-br from-gray-500 via-gray-700 to-gray-900 opacity-60" />
+                  {/* Highlight edge */}
+                  <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-b from-white/20 via-transparent to-transparent" />
                 </div>
 
-                {/* Side Buttons - Left */}
-                <div className="absolute -left-[2px] top-28 w-[3px] h-8 bg-gray-700 rounded-l-sm" /> {/* Silent Switch */}
-                <div className="absolute -left-[2px] top-44 w-[3px] h-12 bg-gray-700 rounded-l-sm" /> {/* Volume Up */}
-                <div className="absolute -left-[2px] top-60 w-[3px] h-12 bg-gray-700 rounded-l-sm" /> {/* Volume Down */}
+                {/* Side Buttons - Left - Enhanced */}
+                <div className="absolute -left-[2px] top-28 w-[3px] h-8 bg-gradient-to-b from-gray-500 to-gray-700 rounded-l-sm shadow-sm" />
+                <div className="absolute -left-[2px] top-44 w-[3px] h-12 bg-gradient-to-b from-gray-500 to-gray-700 rounded-l-sm shadow-sm" />
+                <div className="absolute -left-[2px] top-60 w-[3px] h-12 bg-gradient-to-b from-gray-500 to-gray-700 rounded-l-sm shadow-sm" />
 
-                {/* Side Button - Right */}
-                <div className="absolute -right-[2px] top-40 w-[3px] h-16 bg-gray-700 rounded-r-sm" /> {/* Power */}
+                {/* Side Button - Right - Enhanced */}
+                <div className="absolute -right-[2px] top-40 w-[3px] h-16 bg-gradient-to-b from-gray-500 to-gray-700 rounded-r-sm shadow-sm" />
 
                 {/* Screen Container */}
                 <div className="absolute inset-[3px] rounded-[3.2rem] bg-black overflow-hidden">
@@ -224,12 +252,11 @@ function HeroSection() {
                       <div className="p-4 bg-white border-b border-gray-100">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <div className="w-9 h-9 rounded-xl bg-primary-500 flex items-center justify-center shadow-lg shadow-primary-500/30">
-                              <span className="text-white font-bold text-sm">B</span>
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-pink-400 flex items-center justify-center shadow-lg shadow-primary-500/30">
+                              <BuzzeeIcon className="w-6 h-6" />
                             </div>
                             <div>
-                              <span className="font-bold text-gray-900">Buzz</span>
-                              <span className="ml-1.5 px-1.5 py-0.5 bg-primary-100 text-primary-700 text-[8px] font-bold rounded">BETA</span>
+                              <span className="font-bold text-gray-900">Buzzee</span>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -255,80 +282,101 @@ function HeroSection() {
                         </div>
                       </div>
 
-                      {/* Mock Deal Cards */}
-                      <div className="px-4 space-y-3">
-                        <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 border-l-4 border-l-green-500">
-                          <div className="flex items-start gap-3">
-                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg">
-                              <span className="text-2xl">🍹</span>
+                      {/* Mock Deal Cards - Enhanced with Icons & Progress */}
+                      <div className="px-4 space-y-2.5">
+                        {/* Deal Card 1 - Cocktails */}
+                        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 shadow-lg shadow-black/5 border border-white/50 relative overflow-hidden">
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-400 to-green-600" />
+                          <div className="flex items-start gap-2.5 pl-1">
+                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center shadow-lg shadow-rose-500/30">
+                              <Wine className="w-5 h-5 text-white" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="text-sm font-bold text-gray-900">2-for-1 Cocktails</div>
-                              <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                                <span className="w-1 h-1 bg-gray-400 rounded-full" />
-                                The Velvet Lounge
+                              <div className="text-[13px] font-bold text-gray-900">2-for-1 Cocktails</div>
+                              <div className="text-[10px] text-gray-500 flex items-center gap-1.5 mt-0.5">
+                                <span>The Velvet Lounge</span>
+                                <span className="text-gray-300">•</span>
+                                <MapPin className="w-2.5 h-2.5" />
+                                <span>0.3 mi</span>
                               </div>
-                              <div className="mt-2 flex items-center gap-2">
-                                <span className="px-2 py-0.5 bg-green-500 text-white text-[9px] font-bold rounded-full flex items-center gap-1">
+                              <div className="mt-1.5 flex items-center gap-2">
+                                <span className="px-1.5 py-0.5 bg-green-500 text-white text-[8px] font-bold rounded-full flex items-center gap-1">
                                   <span className="w-1 h-1 bg-white rounded-full animate-pulse" />
                                   LIVE
                                 </span>
-                                <span className="text-[10px] text-gray-500">Ends 8PM</span>
+                                <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full" style={{width: '68%'}} />
+                                </div>
+                                <span className="text-[8px] text-gray-400">34/50</span>
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-xs text-gray-400">Save</div>
+                              <div className="text-[9px] text-gray-400">Save</div>
                               <div className="text-sm font-bold text-green-600">$15</div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 border-l-4 border-l-green-500">
-                          <div className="flex items-start gap-3">
-                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg">
-                              <span className="text-2xl">🍕</span>
+                        {/* Deal Card 2 - Appetizers */}
+                        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 shadow-lg shadow-black/5 border border-white/50 relative overflow-hidden">
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-400 to-green-600" />
+                          <div className="flex items-start gap-2.5 pl-1">
+                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                              <UtensilsCrossed className="w-5 h-5 text-white" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="text-sm font-bold text-gray-900">50% Off Appetizers</div>
-                              <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                                <span className="w-1 h-1 bg-gray-400 rounded-full" />
-                                Urban Kitchen
+                              <div className="text-[13px] font-bold text-gray-900">50% Off Appetizers</div>
+                              <div className="text-[10px] text-gray-500 flex items-center gap-1.5 mt-0.5">
+                                <span>Urban Kitchen</span>
+                                <span className="text-gray-300">•</span>
+                                <MapPin className="w-2.5 h-2.5" />
+                                <span>0.5 mi</span>
                               </div>
-                              <div className="mt-2 flex items-center gap-2">
-                                <span className="px-2 py-0.5 bg-green-500 text-white text-[9px] font-bold rounded-full flex items-center gap-1">
+                              <div className="mt-1.5 flex items-center gap-2">
+                                <span className="px-1.5 py-0.5 bg-green-500 text-white text-[8px] font-bold rounded-full flex items-center gap-1">
                                   <span className="w-1 h-1 bg-white rounded-full animate-pulse" />
                                   LIVE
                                 </span>
-                                <span className="text-[10px] text-red-500 font-semibold">1hr left!</span>
+                                <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full" style={{width: '70%'}} />
+                                </div>
+                                <span className="text-[8px] text-red-500 font-semibold">1hr left</span>
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-xs text-gray-400">Save</div>
+                              <div className="text-[9px] text-gray-400">Save</div>
                               <div className="text-sm font-bold text-green-600">$12</div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 border-l-4 border-l-amber-400">
-                          <div className="flex items-start gap-3">
-                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg">
-                              <span className="text-2xl">🎉</span>
+                        {/* Deal Card 3 - Club Entry */}
+                        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 shadow-lg shadow-black/5 border border-white/50 relative overflow-hidden">
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500" />
+                          <div className="flex items-start gap-2.5 pl-1">
+                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                              <PartyPopper className="w-5 h-5 text-white" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="text-sm font-bold text-gray-900">Free Entry + Drink</div>
-                              <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                                <span className="w-1 h-1 bg-gray-400 rounded-full" />
-                                Club Neon
+                              <div className="text-[13px] font-bold text-gray-900">Free Entry + Drink</div>
+                              <div className="text-[10px] text-gray-500 flex items-center gap-1.5 mt-0.5">
+                                <span>Club Neon</span>
+                                <span className="text-gray-300">•</span>
+                                <MapPin className="w-2.5 h-2.5" />
+                                <span>0.8 mi</span>
                               </div>
-                              <div className="mt-2 flex items-center gap-2">
-                                <span className="px-2 py-0.5 bg-amber-500 text-white text-[9px] font-bold rounded-full">
+                              <div className="mt-1.5 flex items-center gap-2">
+                                <span className="px-1.5 py-0.5 bg-amber-500 text-white text-[8px] font-bold rounded-full">
                                   STARTS 9PM
                                 </span>
-                                <span className="text-[10px] text-gray-500">Today only</span>
+                                <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full" style={{width: '89%'}} />
+                                </div>
+                                <span className="text-[8px] text-gray-400">89/100</span>
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-xs text-gray-400">Save</div>
+                              <div className="text-[9px] text-gray-400">Save</div>
                               <div className="text-sm font-bold text-green-600">$25</div>
                             </div>
                           </div>
@@ -373,15 +421,17 @@ function HeroSection() {
                       <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-900 rounded-full" />
                     </div>
 
-                    {/* Screen Reflection Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none rounded-[3rem]" />
+                    {/* Enhanced Screen Reflection Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/25 via-white/5 to-transparent pointer-events-none rounded-[3rem]" />
+                    {/* Secondary reflection */}
+                    <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/10 to-transparent pointer-events-none rounded-t-[3rem]" />
                   </div>
                 </div>
               </div>
 
-              {/* Floating Notification Badge */}
-              <div className="absolute -top-6 -right-6 px-4 py-3 bg-white rounded-2xl shadow-2xl border border-gray-100 flex items-center gap-3 animate-bounce-slow">
-                <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/30">
+              {/* Floating Notification Badge - Enhanced */}
+              <div className="absolute -top-6 -right-6 px-4 py-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/10 border border-white/50 flex items-center gap-3 animate-bounce-slow">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/40">
                   <Check className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -390,9 +440,9 @@ function HeroSection() {
                 </div>
               </div>
 
-              {/* Secondary floating element */}
-              <div className="absolute -bottom-4 -left-8 px-3 py-2 bg-primary-500 rounded-xl shadow-xl shadow-primary-500/30 flex items-center gap-2 text-white">
-                <Bell className="w-4 h-4" />
+              {/* Secondary floating element - Enhanced */}
+              <div className="absolute -bottom-4 -left-8 px-4 py-2.5 bg-gradient-to-r from-primary-500 to-pink-500 rounded-xl shadow-xl shadow-primary-500/40 flex items-center gap-2 text-white">
+                <Bell className="w-4 h-4 animate-pulse" />
                 <span className="text-xs font-semibold">New deal nearby!</span>
               </div>
             </div>
@@ -442,7 +492,7 @@ function FeaturesSection() {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium text-sm mb-4">
             <Sparkles className="w-4 h-4" />
-            Why Choose Buzz
+            Why Choose Buzzee
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Deals That Are{' '}
@@ -533,7 +583,7 @@ function HowItWorksSection() {
 
         {/* Example Timeline */}
         <div className="bg-gray-50 rounded-3xl p-8 max-w-3xl mx-auto border border-gray-100">
-          <h4 className="font-bold text-gray-900 mb-6 text-center text-lg">A Typical Day on Buzz</h4>
+          <h4 className="font-bold text-gray-900 mb-6 text-center text-lg">A Typical Day on Buzzee</h4>
           <div className="space-y-4">
             <div className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-primary-200 transition-colors">
               <div className="w-16 h-16 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
@@ -584,8 +634,8 @@ function HowItWorksSection() {
   );
 }
 
-// For Venues Section
-function ForVenuesSection() {
+// For Business Section
+function ForBusinessSection() {
   const benefits = [
     {
       icon: Zap,
@@ -619,7 +669,7 @@ function ForVenuesSection() {
   ];
 
   return (
-    <section id="for-venues" className="py-24 px-4 bg-gray-900 text-white relative overflow-hidden">
+    <section id="for-business" className="py-24 px-4 bg-gray-900 text-white relative overflow-hidden">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-0 left-0 w-full h-full" style={{
@@ -634,14 +684,14 @@ function ForVenuesSection() {
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-primary-300 font-medium text-sm mb-6 border border-white/10">
               <TrendingUp className="w-4 h-4" />
-              For Venue Owners
+              For Business Owners
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
               Fill Seats with{' '}
               <span className="text-primary-400">Live Deals</span>
             </h2>
             <p className="text-lg text-gray-300 mb-10 leading-relaxed">
-              Slow night? Launch a deal and drive traffic instantly. Buzz lets you create time-limited offers that bring customers through the door — today, not someday.
+              Slow night? Launch a deal and drive traffic instantly. Buzzee lets you create time-limited offers that bring customers through the door — today, not someday.
             </p>
 
             <div className="grid sm:grid-cols-2 gap-6 mb-10">
@@ -659,7 +709,7 @@ function ForVenuesSection() {
             </div>
 
             <a
-              href="https://dashboard.buzz.app/register"
+              href="http://localhost:3001/register"
               className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary-500 text-white font-semibold rounded-full shadow-lg shadow-primary-500/25 hover:bg-primary-400 transition-all hover:shadow-xl"
             >
               Get Started Free
@@ -667,38 +717,78 @@ function ForVenuesSection() {
             </a>
           </div>
 
-          {/* Right Content - Pricing Card */}
-          <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10">
-            <div className="text-center mb-8">
-              <span className="inline-block px-3 py-1 bg-primary-500 text-white text-sm font-semibold rounded-full mb-4">
-                Most Popular
-              </span>
-              <h3 className="text-2xl font-bold text-white mb-2">Buzz Pro</h3>
-              <div className="flex items-baseline justify-center gap-1">
-                <span className="text-5xl font-bold text-white">$49</span>
-                <span className="text-gray-400">/month</span>
+          {/* Right Content - Pricing Cards */}
+          <div className="space-y-6">
+            {/* Starter Plan */}
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-white">Starter</h3>
+                  <p className="text-sm text-gray-400">For small venues testing the platform</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-3xl font-bold text-white">$99</span>
+                  <span className="text-gray-400">/mo</span>
+                </div>
               </div>
-              <p className="text-gray-400 mt-2">per venue location</p>
+              <div className="flex flex-wrap gap-2">
+                {['10 deals/month', 'Basic analytics', 'Email support', '1 user'].map((feature, i) => (
+                  <span key={i} className="px-3 py-1 bg-white/10 rounded-full text-sm text-gray-300">{feature}</span>
+                ))}
+              </div>
             </div>
 
-            <ul className="space-y-4 mb-8">
-              {pricingFeatures.map((feature, index) => (
-                <li key={index} className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3.5 h-3.5 text-white" />
-                  </div>
-                  <span className="text-gray-200">{feature}</span>
-                </li>
-              ))}
-            </ul>
+            {/* Pro Plan - Featured */}
+            <div className="bg-gradient-to-br from-primary-500/20 to-purple-500/20 backdrop-blur-xl rounded-2xl p-6 border-2 border-primary-500 relative">
+              <div className="absolute -top-3 right-6">
+                <span className="px-3 py-1 bg-primary-500 text-white text-xs font-bold rounded-full">POPULAR</span>
+              </div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-white">Pro</h3>
+                  <p className="text-sm text-gray-300">For active venues maximizing traffic</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-3xl font-bold text-white">$199</span>
+                  <span className="text-gray-300">/mo</span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {['Unlimited deals', 'AI insights', 'Priority support', '5 users', 'Custom branding'].map((feature, i) => (
+                  <span key={i} className="px-3 py-1 bg-white/10 rounded-full text-sm text-gray-200">{feature}</span>
+                ))}
+              </div>
+              <a
+                href="http://localhost:3001/register"
+                className="block w-full py-3 bg-primary-500 text-white font-semibold rounded-xl text-center hover:bg-primary-400 transition-colors"
+              >
+                Start Free Trial
+              </a>
+            </div>
 
-            <a
-              href="https://dashboard.buzz.app/register"
-              className="block w-full py-4 bg-white text-gray-900 font-semibold rounded-2xl text-center hover:bg-gray-100 transition-colors"
-            >
-              Start 14-Day Free Trial
-            </a>
-            <p className="text-center text-sm text-gray-500 mt-4">No credit card required</p>
+            {/* Enterprise Plan */}
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-white">Enterprise</h3>
+                  <p className="text-sm text-gray-400">For chains and large groups</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-2xl font-bold text-white">Custom</span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {['Multi-location', 'API access', 'Dedicated manager', 'SLA'].map((feature, i) => (
+                  <span key={i} className="px-3 py-1 bg-white/10 rounded-full text-sm text-gray-300">{feature}</span>
+                ))}
+              </div>
+              <a
+                href="#contact"
+                className="block w-full py-3 bg-white/10 text-white font-semibold rounded-xl text-center hover:bg-white/20 transition-colors border border-white/20"
+              >
+                Contact Sales
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -742,7 +832,7 @@ function DownloadSection() {
           Don't Miss Today's Deals
         </h2>
         <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
-          New deals go live every day. Download Buzz and start catching live offers at venues near you.
+          New deals go live every day. Download Buzzee and start catching live offers at venues near you.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -789,10 +879,10 @@ function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">B</span>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-pink-400 flex items-center justify-center">
+                <BuzzeeIcon className="w-7 h-7" />
               </div>
-              <span className="text-2xl font-bold">Buzz</span>
+              <span className="text-2xl font-bold">Buzzee</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               Catch live deals at local venues. Daily, time-limited offers from bars, restaurants, and clubs near you.
@@ -804,7 +894,7 @@ function Footer() {
             <h4 className="font-semibold mb-4 text-white">Product</h4>
             <ul className="space-y-3 text-gray-400">
               <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-              <li><a href="#for-venues" className="hover:text-white transition-colors">For Venues</a></li>
+              <li><a href="#for-business" className="hover:text-white transition-colors">For Business</a></li>
               <li><a href="#download" className="hover:text-white transition-colors">Download</a></li>
             </ul>
           </div>
@@ -833,7 +923,7 @@ function Footer() {
 
         <div className="pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} Buzz. All rights reserved.
+            &copy; {new Date().getFullYear()} Buzzee. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all">
@@ -860,7 +950,7 @@ function App() {
       <HeroSection />
       <FeaturesSection />
       <HowItWorksSection />
-      <ForVenuesSection />
+      <ForBusinessSection />
       <SocialProofSection />
       <DownloadSection />
       <Footer />

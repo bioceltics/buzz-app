@@ -1,4 +1,4 @@
-// AI/ML Types for Buzz Platform
+// AI/ML Types for Buzzee Platform
 
 // ==================== USER AI TYPES ====================
 

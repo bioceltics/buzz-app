@@ -59,7 +59,7 @@ export function ForgotPasswordPage() {
     <div>
       {/* Mobile Logo */}
       <div className="lg:hidden text-center mb-8">
-        <h1 className="text-3xl font-bold text-primary-500">Buzz</h1>
+        <h1 className="text-3xl font-bold text-primary-500">Buzzee</h1>
         <p className="text-gray-500">Venue Dashboard</p>
       </div>
 

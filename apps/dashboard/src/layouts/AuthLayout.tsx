@@ -21,7 +21,7 @@ export function AuthLayout() {
       {/* Left Panel - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-primary-500 p-12 flex-col justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-white">Buzz</h1>
+          <h1 className="text-4xl font-bold text-white">Buzzee</h1>
           <p className="mt-2 text-primary-100">Venue Dashboard</p>
         </div>
         <div className="space-y-6">
@@ -53,7 +53,7 @@ export function AuthLayout() {
           </div>
         </div>
         <p className="text-primary-200 text-sm">
-          © 2024 Buzz. All rights reserved.
+          © 2024 Buzzee. All rights reserved.
         </p>
       </div>
 

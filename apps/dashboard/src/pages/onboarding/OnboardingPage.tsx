@@ -32,7 +32,7 @@ export function OnboardingPage() {
       <div className="max-w-3xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary-500">Buzz</h1>
+          <h1 className="text-3xl font-bold text-primary-500">Buzzee</h1>
           <h2 className="text-xl font-semibold text-gray-900 mt-4">Set up your venue</h2>
           <p className="text-gray-600 mt-2">
             Complete these steps to start promoting your business

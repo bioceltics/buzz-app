@@ -10,14 +10,20 @@ import {
   Alert,
   StatusBar,
   Animated,
-  Image,
+  Dimensions,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button, Input } from '@/components/ui';
+import { BuzzeeIcon } from '@/components/ui/BuzzeeIcon';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, ANIMATION } from '@/constants/colors';
+
+const { width } = Dimensions.get('window');
+const isWeb = Platform.OS === 'web';
+const maxFormWidth = 440;
 
 export default function LoginScreen() {
   const { signIn, signInWithGoogle, signInWithApple, signInWithFacebook, isLoading } =
@@ -84,7 +90,11 @@ export default function LoginScreen() {
     try {
       await signIn(email, password);
     } catch (error: any) {
-      Alert.alert('Login Failed', error.message);
+      if (Platform.OS === 'web') {
+        window.alert(`Login Failed\n\n${error.message}`);
+      } else {
+        Alert.alert('Login Failed', error.message);
+      }
     }
   };
 
@@ -102,201 +112,253 @@ export default function LoginScreen() {
           break;
       }
     } catch (error: any) {
-      Alert.alert('Login Failed', error.message);
+      if (Platform.OS === 'web') {
+        window.alert(`Login Failed\n\n${error.message}`);
+      } else {
+        Alert.alert('Login Failed', error.message);
+      }
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
+    <View style={styles.outerContainer}>
+      <LinearGradient
+        colors={[COLORS.primary + '08', COLORS.white, COLORS.white]}
+        style={styles.backgroundGradient}
+      />
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
         >
-          {/* Header with Logo */}
-          <Animated.View
-            style={[
-              styles.header,
-              {
-                transform: [{ scale: logoScaleAnim }],
-                opacity: logoOpacityAnim,
-              },
-            ]}
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
-            <View style={styles.logoContainer}>
-              <Image
-                source={require('@/assets/logo.png')}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={styles.logo}>Buzzer</Text>
-            <Text style={styles.title}>Welcome back!</Text>
-            <Text style={styles.subtitle}>
-              Sign in to discover exclusive deals near you
-            </Text>
-          </Animated.View>
-
-          {/* Form */}
-          <Animated.View
-            style={[
-              styles.form,
-              {
-                transform: [{ translateY: formTranslateYAnim }],
-                opacity: formOpacityAnim,
-              },
-            ]}
-          >
-            <Input
-              label="Email"
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              leftIcon="mail-outline"
-              error={errors.email}
-            />
-
-            <Input
-              label="Password"
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              leftIcon="lock-closed-outline"
-              error={errors.password}
-            />
-
-            {/* Forgot Password */}
-            <TouchableOpacity
-              style={styles.forgotPassword}
-              onPress={() => router.push('/(auth)/forgot-password')}
-            >
-              <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-            </TouchableOpacity>
-
-            {/* Login Button */}
-            <Button
-              title="Sign In"
-              onPress={handleLogin}
-              loading={isLoading}
-              size="lg"
-              style={styles.loginButton}
-            />
-
-            {/* Phone Login */}
-            <Button
-              title="Sign in with Phone"
-              variant="outline"
-              onPress={() => router.push('/(auth)/verify-phone')}
-              leftIcon="phone-portrait-outline"
-              size="lg"
-            />
-          </Animated.View>
-
-          {/* Divider */}
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or continue with</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Social Login */}
-          <View style={styles.socialButtons}>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => handleSocialLogin('google')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="logo-google" size={24} color="#DB4437" />
-            </TouchableOpacity>
-            {Platform.OS === 'ios' && (
-              <TouchableOpacity
-                style={styles.socialButton}
-                onPress={() => handleSocialLogin('apple')}
-                activeOpacity={0.7}
+            <View style={styles.contentWrapper}>
+              {/* Header with Logo */}
+              <Animated.View
+                style={[
+                  styles.header,
+                  {
+                    transform: [{ scale: logoScaleAnim }],
+                    opacity: logoOpacityAnim,
+                  },
+                ]}
               >
-                <Ionicons name="logo-apple" size={24} color={COLORS.text} />
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => handleSocialLogin('facebook')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="logo-facebook" size={24} color="#4267B2" />
-            </TouchableOpacity>
-          </View>
+                <View style={styles.logoContainer}>
+                  <LinearGradient
+                    colors={[COLORS.primary, '#F06292']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.logoGradient}
+                  >
+                    <BuzzeeIcon size={48} color={COLORS.white} />
+                  </LinearGradient>
+                </View>
+                <Text style={styles.logo}>Buzzee</Text>
+                <Text style={styles.subtitle}>
+                  Discover exclusive deals near you
+                </Text>
+              </Animated.View>
 
-          {/* Sign Up Link */}
-          <View style={styles.signUpContainer}>
-            <Text style={styles.signUpText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
-              <Text style={styles.signUpLink}>Sign Up</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+              {/* Form Card */}
+              <Animated.View
+                style={[
+                  styles.formCard,
+                  {
+                    transform: [{ translateY: formTranslateYAnim }],
+                    opacity: formOpacityAnim,
+                  },
+                ]}
+              >
+                <Text style={styles.formTitle}>Welcome back!</Text>
+
+                <Input
+                  label="Email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  leftIcon="mail-outline"
+                  error={errors.email}
+                />
+
+                <Input
+                  label="Password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  leftIcon="lock-closed-outline"
+                  error={errors.password}
+                />
+
+                {/* Forgot Password */}
+                <TouchableOpacity
+                  style={styles.forgotPassword}
+                  onPress={() => router.push('/(auth)/forgot-password')}
+                >
+                  <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+                </TouchableOpacity>
+
+                {/* Login Button */}
+                <TouchableOpacity
+                  style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+                  onPress={handleLogin}
+                  disabled={isLoading}
+                  activeOpacity={0.8}
+                >
+                  <LinearGradient
+                    colors={isLoading ? [COLORS.textTertiary, COLORS.textTertiary] : [COLORS.primary, '#D81B60']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.loginButtonGradient}
+                  >
+                    {isLoading ? (
+                      <Text style={styles.loginButtonText}>Signing in...</Text>
+                    ) : (
+                      <>
+                        <Text style={styles.loginButtonText}>Sign In</Text>
+                        <Ionicons name="arrow-forward" size={20} color={COLORS.white} />
+                      </>
+                    )}
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                {/* Phone Login */}
+                <Button
+                  title="Sign in with Phone"
+                  variant="outline"
+                  onPress={() => router.push('/(auth)/verify-phone')}
+                  leftIcon="phone-portrait-outline"
+                  size="lg"
+                />
+              </Animated.View>
+
+              {/* Divider */}
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>or continue with</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              {/* Social Login */}
+              <View style={styles.socialButtons}>
+                <TouchableOpacity
+                  style={styles.socialButton}
+                  onPress={() => handleSocialLogin('google')}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="logo-google" size={24} color="#DB4437" />
+                </TouchableOpacity>
+                {Platform.OS === 'ios' && (
+                  <TouchableOpacity
+                    style={styles.socialButton}
+                    onPress={() => handleSocialLogin('apple')}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="logo-apple" size={24} color={COLORS.text} />
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  style={styles.socialButton}
+                  onPress={() => handleSocialLogin('facebook')}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="logo-facebook" size={24} color="#4267B2" />
+                </TouchableOpacity>
+              </View>
+
+              {/* Sign Up Link */}
+              <View style={styles.signUpContainer}>
+                <Text style={styles.signUpText}>Don't have an account? </Text>
+                <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
+                  <Text style={styles.signUpLink}>Sign Up</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
     flex: 1,
     backgroundColor: COLORS.white,
+  },
+  backgroundGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '50%',
+  },
+  container: {
+    flex: 1,
   },
   keyboardView: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    padding: SPACING.xl,
+    padding: SPACING.lg,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentWrapper: {
+    width: '100%',
+    maxWidth: maxFormWidth,
   },
   header: {
     alignItems: 'center',
-    marginBottom: SPACING['2xl'],
-    marginTop: SPACING.lg,
+    marginBottom: SPACING.xl,
   },
   logoContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: RADIUS['2xl'],
+    width: 88,
+    height: 88,
+    borderRadius: 28,
     overflow: 'hidden',
     marginBottom: SPACING.md,
-    ...SHADOWS.primary,
+    ...SHADOWS.lg,
   },
-  logoImage: {
+  logoGradient: {
     width: '100%',
     height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   logo: {
-    fontSize: TYPOGRAPHY.sizes['4xl'],
-    fontWeight: TYPOGRAPHY.weights.bold,
-    color: COLORS.primary,
-    marginBottom: SPACING.md,
-    letterSpacing: TYPOGRAPHY.letterSpacing.tight,
-  },
-  title: {
-    fontSize: TYPOGRAPHY.sizes['2xl'],
-    fontWeight: TYPOGRAPHY.weights.bold,
+    fontSize: 36,
+    fontWeight: TYPOGRAPHY.weights.heavy,
     color: COLORS.text,
+    letterSpacing: -1,
   },
   subtitle: {
-    fontSize: TYPOGRAPHY.sizes.base,
+    fontSize: TYPOGRAPHY.sizes.sm,
     color: COLORS.textSecondary,
     marginTop: SPACING.sm,
     textAlign: 'center',
   },
-  form: {
+  formCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS['2xl'],
+    padding: SPACING.xl,
+    ...SHADOWS.lg,
+  },
+  formTitle: {
+    fontSize: TYPOGRAPHY.sizes.xl,
+    fontWeight: TYPOGRAPHY.weights.bold,
+    color: COLORS.text,
     marginBottom: SPACING.lg,
+    textAlign: 'center',
   },
   forgotPassword: {
     alignSelf: 'flex-end',
@@ -309,7 +371,25 @@ const styles = StyleSheet.create({
     fontWeight: TYPOGRAPHY.weights.semibold,
   },
   loginButton: {
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
     marginBottom: SPACING.md,
+    ...SHADOWS.md,
+  },
+  loginButtonGradient: {
+    flexDirection: 'row',
+    height: 54,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  loginButtonDisabled: {
+    opacity: 0.7,
+  },
+  loginButtonText: {
+    color: COLORS.white,
+    fontSize: TYPOGRAPHY.sizes.lg,
+    fontWeight: TYPOGRAPHY.weights.bold,
   },
   divider: {
     flexDirection: 'row',
@@ -346,8 +426,8 @@ const styles = StyleSheet.create({
   signUpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: SPACING['2xl'],
-    paddingBottom: SPACING.xl,
+    marginTop: SPACING.xl,
+    paddingBottom: SPACING.lg,
   },
   signUpText: {
     color: COLORS.textSecondary,

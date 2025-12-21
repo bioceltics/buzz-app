@@ -102,11 +102,11 @@ export function ScannerPage() {
       const qrData: QRData = JSON.parse(data);
 
       if (qrData.type !== 'buzz_deal') {
-        toast.error('Invalid QR code - not a Buzz deal');
+        toast.error('Invalid QR code - not a Buzzee deal');
         setVerificationResult({
           success: false,
           status: 'invalid_code',
-          message: 'This QR code is not a valid Buzz deal code.',
+          message: 'This QR code is not a valid Buzzee deal code.',
         });
         return;
       }
@@ -426,7 +426,7 @@ export function ScannerPage() {
                 <span className="w-5 h-5 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">
                   1
                 </span>
-                <span>Customer shows their QR code from the Buzz app</span>
+                <span>Customer shows their QR code from the Buzzee app</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="w-5 h-5 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">

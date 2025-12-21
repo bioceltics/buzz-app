@@ -59,7 +59,6 @@ export function Input({
   // Animation values
   const focusAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const labelPositionAnim = useRef(new Animated.Value(hasValue || !!value ? 1 : 0)).current;
   const shakeAnim = useRef(new Animated.Value(0)).current;
   const iconScaleAnim = useRef(new Animated.Value(1)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
@@ -70,13 +69,6 @@ export function Input({
   // Update hasValue when value changes
   useEffect(() => {
     setHasValue(!!value);
-    if (value) {
-      Animated.timing(labelPositionAnim, {
-        toValue: 1,
-        duration: ANIMATION.duration.fast,
-        useNativeDriver: true,
-      }).start();
-    }
   }, [value]);
 
   // Focus animation
@@ -117,18 +109,11 @@ export function Input({
     (e: any) => {
       setIsFocused(true);
       if (animated) {
-        Animated.parallel([
-          Animated.spring(scaleAnim, {
-            toValue: 1.01,
-            useNativeDriver: true,
-            ...ANIMATION.spring.snappy,
-          }),
-          Animated.timing(labelPositionAnim, {
-            toValue: 1,
-            duration: ANIMATION.duration.fast,
-            useNativeDriver: true,
-          }),
-        ]).start();
+        Animated.spring(scaleAnim, {
+          toValue: 1.01,
+          useNativeDriver: true,
+          ...ANIMATION.spring.snappy,
+        }).start();
       }
       onFocus?.(e);
     },
@@ -144,17 +129,10 @@ export function Input({
           useNativeDriver: true,
           ...ANIMATION.spring.smooth,
         }).start();
-        if (!hasValue) {
-          Animated.timing(labelPositionAnim, {
-            toValue: 0,
-            duration: ANIMATION.duration.fast,
-            useNativeDriver: true,
-          }).start();
-        }
       }
       onBlur?.(e);
     },
-    [onBlur, hasValue, animated]
+    [onBlur, animated]
   );
 
   // Interpolated values
@@ -169,16 +147,6 @@ export function Input({
       variant === 'filled' ? COLORS.backgroundTertiary : COLORS.white,
       variant === 'filled' ? COLORS.primaryLighter : COLORS.white,
     ],
-  });
-
-  const labelTranslateY = labelPositionAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [16, -8],
-  });
-
-  const labelScale = labelPositionAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0.85],
   });
 
   const shadowOpacity = glowAnim.interpolate({
@@ -197,36 +165,20 @@ export function Input({
         },
       ]}
     >
-      {/* Floating Label */}
+      {/* Static Label - Always above the input */}
       {label && (
-        <Animated.View
-          style={[
-            styles.labelContainer,
-            {
-              transform: [{ translateY: labelTranslateY }, { scale: labelScale }],
-              backgroundColor: hasValue || isFocused ? COLORS.white : 'transparent',
-            },
-          ]}
-          pointerEvents="none"
-        >
-          <Animated.Text
+        <View style={styles.labelContainer}>
+          <Text
             style={[
               styles.label,
-              {
-                color: focusAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [
-                    error ? COLORS.error : COLORS.textSecondary,
-                    error ? COLORS.error : COLORS.primary,
-                  ],
-                }),
-              },
+              isFocused && styles.labelFocused,
+              error && styles.labelError,
             ]}
           >
             {label}
             {required && <Text style={styles.required}> *</Text>}
-          </Animated.Text>
-        </Animated.View>
+          </Text>
+        </View>
       )}
 
       {/* Input Container */}
@@ -287,6 +239,7 @@ export function Input({
             (rightIcon || isPassword) && styles.inputWithRightIcon,
             disabled && styles.inputDisabled,
           ]}
+          placeholder={props.placeholder}
           placeholderTextColor={COLORS.textTertiary}
           editable={!disabled}
           secureTextEntry={isPassword && !showPassword}
@@ -382,19 +335,21 @@ export function Input({
 const styles = StyleSheet.create({
   container: {
     marginBottom: SPACING.base,
-    position: 'relative',
   },
   labelContainer: {
-    position: 'absolute',
-    left: SPACING.base,
-    top: 0,
-    zIndex: 10,
+    marginBottom: SPACING.sm,
     paddingHorizontal: SPACING.xs,
-    borderRadius: RADIUS.xs,
   },
   label: {
-    fontSize: TYPOGRAPHY.sizes.base,
-    fontWeight: TYPOGRAPHY.weights.medium,
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    color: COLORS.textSecondary,
+  },
+  labelFocused: {
+    color: COLORS.primary,
+  },
+  labelError: {
+    color: COLORS.error,
   },
   required: {
     color: COLORS.error,

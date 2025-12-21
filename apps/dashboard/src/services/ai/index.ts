@@ -1,4 +1,4 @@
-// AI/ML Services for Buzz Platform
+// AI/ML Services for Buzzee Platform
 // Export all AI services and types
 
 // Types

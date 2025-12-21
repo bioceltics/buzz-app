@@ -1,4 +1,4 @@
-// AI Recommendation Engine for Buzz Platform
+// AI Recommendation Engine for Buzzee Platform
 // Handles personalized deal recommendations for users
 
 import {

@@ -125,7 +125,7 @@ export function LoginPage() {
           variants={fadeInUp}
           className="text-3xl font-bold text-gray-900"
         >
-          Buzz
+          Buzzee
         </motion.h1>
         <motion.p
           variants={fadeInUp}
@@ -398,7 +398,7 @@ export function LoginPage() {
           transition={{ delay: 0.6 }}
           className="relative flex justify-center text-sm"
         >
-          <span className="px-4 bg-white text-gray-500">New to Buzz?</span>
+          <span className="px-4 bg-white text-gray-500">New to Buzzee?</span>
         </motion.div>
       </motion.div>
 
