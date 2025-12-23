@@ -5,15 +5,16 @@ import {
   StyleSheet,
   FlatList,
   SafeAreaView,
-  TouchableOpacity,
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { VenueCard } from '@/components/venues/VenueCard';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui';
+import { BuzzeeIcon } from '@/components/ui/BuzzeeIcon';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 
 export default function FavoritesScreen() {
@@ -24,13 +25,25 @@ export default function FavoritesScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
+        {/* Header with Logo */}
         <View style={styles.header}>
-          <Text style={styles.title}>Favorites</Text>
+          <View style={styles.headerLeft}>
+            <LinearGradient
+              colors={[COLORS.primary, '#D81B60']}
+              style={styles.logoContainer}
+            >
+              <BuzzeeIcon size={18} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.logoText}>Buzzee</Text>
+          </View>
         </View>
         <View style={styles.emptyState}>
-          <View style={styles.emptyIconContainer}>
-            <Ionicons name="heart" size={40} color={COLORS.error} />
-          </View>
+          <LinearGradient
+            colors={['#DC2626', '#EF4444']}
+            style={styles.emptyIconContainer}
+          >
+            <Ionicons name="heart" size={40} color={COLORS.white} />
+          </LinearGradient>
           <Text style={styles.emptyTitle}>Sign in to save favorites</Text>
           <Text style={styles.emptySubtext}>
             Keep track of your favorite venues and never miss their best deals
@@ -49,13 +62,25 @@ export default function FavoritesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
+      {/* Header with Logo */}
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.title}>Favorites</Text>
-          <View style={styles.countBadge}>
-            <Text style={styles.countBadgeText}>{favorites.length}</Text>
+        <View style={styles.headerTop}>
+          <View style={styles.headerLeft}>
+            <LinearGradient
+              colors={[COLORS.primary, '#D81B60']}
+              style={styles.logoContainer}
+            >
+              <BuzzeeIcon size={18} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.logoText}>Buzzee</Text>
           </View>
+          {favorites.length > 0 && (
+            <View style={styles.countBadge}>
+              <Text style={styles.countBadgeText}>{favorites.length}</Text>
+            </View>
+          )}
         </View>
+        <Text style={styles.title}>Favorites</Text>
         {favorites.length > 0 && (
           <Text style={styles.subtitle}>
             Your saved venues and their latest deals
@@ -79,9 +104,12 @@ export default function FavoritesScreen() {
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <View style={styles.emptyIconContainer}>
-              <Ionicons name="heart-outline" size={40} color={COLORS.primary} />
-            </View>
+            <LinearGradient
+              colors={[COLORS.primary, '#D81B60']}
+              style={styles.emptyIconContainer}
+            >
+              <Ionicons name="heart-outline" size={40} color={COLORS.white} />
+            </LinearGradient>
             <Text style={styles.emptyTitle}>No favorites yet</Text>
             <Text style={styles.emptySubtext}>
               Tap the heart icon on any venue to save it here for quick access
@@ -104,82 +132,101 @@ export default function FavoritesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundSecondary,
+    backgroundColor: '#F8FAFC',
   },
   header: {
-    paddingHorizontal: SPACING.base,
-    paddingVertical: SPACING.base,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderLight,
-    ...SHADOWS.sm,
+    borderBottomColor: '#F3F4F6',
   },
-  headerContent: {
+  headerTop: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  logoContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.md,
+  },
+  logoText: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#111827',
+    letterSpacing: -0.5,
   },
   title: {
-    fontSize: TYPOGRAPHY.sizes['3xl'],
-    fontWeight: TYPOGRAPHY.weights.heavy,
-    color: COLORS.text,
-    letterSpacing: TYPOGRAPHY.letterSpacing.tight,
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#111827',
+    letterSpacing: -0.5,
   },
   countBadge: {
     backgroundColor: COLORS.primaryLighter,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: RADIUS.full,
-    marginLeft: SPACING.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
   countBadgeText: {
-    fontSize: TYPOGRAPHY.sizes.sm,
-    fontWeight: TYPOGRAPHY.weights.bold,
+    fontSize: 14,
+    fontWeight: '700',
     color: COLORS.primary,
   },
   subtitle: {
-    fontSize: TYPOGRAPHY.sizes.sm,
+    fontSize: 14,
     color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
+    marginTop: 4,
   },
   listContent: {
-    padding: SPACING.base,
+    padding: 16,
     flexGrow: 1,
   },
   cardWrapper: {
     marginBottom: 0,
   },
   separator: {
-    height: SPACING.md,
+    height: 12,
   },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: SPACING['2xl'],
-    paddingVertical: SPACING['4xl'],
+    paddingHorizontal: 32,
+    paddingVertical: 60,
   },
   emptyIconContainer: {
     width: 100,
     height: 100,
-    borderRadius: RADIUS.full,
-    backgroundColor: COLORS.errorLight,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: SPACING.lg,
+    marginBottom: 20,
+    ...SHADOWS.lg,
   },
   emptyTitle: {
-    fontSize: TYPOGRAPHY.sizes.xl,
-    fontWeight: TYPOGRAPHY.weights.bold,
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 8,
     textAlign: 'center',
   },
   emptySubtext: {
-    fontSize: TYPOGRAPHY.sizes.base,
+    fontSize: 15,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    lineHeight: TYPOGRAPHY.sizes.base * TYPOGRAPHY.lineHeights.relaxed,
-    marginBottom: SPACING.xl,
+    lineHeight: 22,
+    marginBottom: 24,
   },
   actionButton: {
     minWidth: 200,

@@ -9,12 +9,15 @@ import {
   Linking,
   ActivityIndicator,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../services/supabase';
 import { useFavorites } from '../../hooks/useFavorites';
+import { useConversations } from '../../hooks/useConversations';
+import { useAuth } from '../../contexts/AuthContext';
 import { Colors } from '../../constants/colors';
 import { formatDistance } from '../../utils/date';
 import DealCard from '../../components/deals/DealCard';
@@ -26,6 +29,9 @@ export default function VenueDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<'deals' | 'events' | 'reviews'>('deals');
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { getOrCreateConversation } = useConversations();
+  const { user } = useAuth();
+  const [isStartingChat, setIsStartingChat] = useState(false);
 
   const { data: venue, isLoading } = useQuery({
     queryKey: ['venue', id],
@@ -129,8 +135,26 @@ export default function VenueDetailScreen() {
     }
   };
 
-  const startChat = () => {
-    router.push(`/chat/${id}`);
+  const startChat = async () => {
+    if (!user) {
+      Alert.alert('Sign In Required', 'Please sign in to message this venue.');
+      return;
+    }
+
+    setIsStartingChat(true);
+    try {
+      const conversation = await getOrCreateConversation(id as string);
+      if (conversation) {
+        router.push(`/chat/${conversation.id}`);
+      } else {
+        Alert.alert('Error', 'Could not start conversation. Please try again.');
+      }
+    } catch (error) {
+      console.error('Failed to start chat:', error);
+      Alert.alert('Error', 'Could not start conversation. Please try again.');
+    } finally {
+      setIsStartingChat(false);
+    }
   };
 
   if (isLoading) {
@@ -220,8 +244,12 @@ export default function VenueDetailScreen() {
                 <Text style={styles.actionText}>Website</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity style={styles.actionButton} onPress={startChat}>
-              <Ionicons name="chatbubble" size={24} color={Colors.primary} />
+            <TouchableOpacity style={styles.actionButton} onPress={startChat} disabled={isStartingChat}>
+              {isStartingChat ? (
+                <ActivityIndicator size="small" color={Colors.primary} />
+              ) : (
+                <Ionicons name="chatbubble" size={24} color={Colors.primary} />
+              )}
               <Text style={styles.actionText}>Chat</Text>
             </TouchableOpacity>
           </View>

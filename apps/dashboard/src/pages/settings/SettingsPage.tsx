@@ -520,6 +520,10 @@ export function SettingsPage() {
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
                       Custom branding
                     </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      Featured placement
+                    </li>
                   </ul>
                   <button className="btn btn-primary w-full mt-6">
                     <Crown className="w-4 h-4 mr-2" />
@@ -557,6 +561,10 @@ export function SettingsPage() {
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
                       SLA guarantees
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      White-label options
                     </li>
                   </ul>
                   <button className="btn btn-outline w-full mt-6">

@@ -11,10 +11,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useConversations } from '@/hooks/useConversations';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatRelativeTime } from '@/utils/date';
 import { Button } from '@/components/ui';
+import { BuzzeeIcon } from '@/components/ui/BuzzeeIcon';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 
 export default function InboxScreen() {
@@ -28,12 +30,23 @@ export default function InboxScreen() {
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
         <View style={styles.header}>
-          <Text style={styles.title}>Inbox</Text>
+          <View style={styles.headerLeft}>
+            <LinearGradient
+              colors={[COLORS.primary, '#D81B60']}
+              style={styles.logoContainer}
+            >
+              <BuzzeeIcon size={18} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.logoText}>Buzzee</Text>
+          </View>
         </View>
         <View style={styles.emptyState}>
-          <View style={styles.emptyIconContainer}>
-            <Ionicons name="chatbubbles" size={40} color={COLORS.info} />
-          </View>
+          <LinearGradient
+            colors={['#3B82F6', '#60A5FA']}
+            style={styles.emptyIconContainer}
+          >
+            <Ionicons name="chatbubbles" size={40} color={COLORS.white} />
+          </LinearGradient>
           <Text style={styles.emptyTitle}>Sign in to view messages</Text>
           <Text style={styles.emptySubtext}>
             Chat with venues about deals, reservations, and special requests
@@ -106,8 +119,16 @@ export default function InboxScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.title}>Inbox</Text>
+        <View style={styles.headerTop}>
+          <View style={styles.headerLeft}>
+            <LinearGradient
+              colors={[COLORS.primary, '#D81B60']}
+              style={styles.logoContainer}
+            >
+              <BuzzeeIcon size={18} color={COLORS.white} />
+            </LinearGradient>
+            <Text style={styles.logoText}>Buzzee</Text>
+          </View>
           {totalUnread > 0 && (
             <View style={styles.headerBadge}>
               <Text style={styles.headerBadgeText}>
@@ -116,6 +137,7 @@ export default function InboxScreen() {
             </View>
           )}
         </View>
+        <Text style={styles.title}>Inbox</Text>
         {conversations && conversations.length > 0 && (
           <Text style={styles.subtitle}>
             {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
@@ -131,9 +153,12 @@ export default function InboxScreen() {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <View style={[styles.emptyIconContainer, { backgroundColor: COLORS.infoLight }]}>
-              <Ionicons name="chatbubbles-outline" size={40} color={COLORS.info} />
-            </View>
+            <LinearGradient
+              colors={['#3B82F6', '#60A5FA']}
+              style={styles.emptyIconContainer}
+            >
+              <Ionicons name="chatbubbles-outline" size={40} color={COLORS.white} />
+            </LinearGradient>
             <Text style={styles.emptyTitle}>No messages yet</Text>
             <Text style={styles.emptySubtext}>
               Start a conversation with a venue to ask about deals or make reservations
@@ -155,42 +180,61 @@ export default function InboxScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundSecondary,
+    backgroundColor: '#F8FAFC',
   },
   header: {
-    paddingHorizontal: SPACING.base,
-    paddingVertical: SPACING.base,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderLight,
-    ...SHADOWS.sm,
+    borderBottomColor: '#F3F4F6',
   },
-  headerContent: {
+  headerTop: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  logoContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.md,
+  },
+  logoText: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#111827',
+    letterSpacing: -0.5,
   },
   title: {
-    fontSize: TYPOGRAPHY.sizes['3xl'],
-    fontWeight: TYPOGRAPHY.weights.heavy,
-    color: COLORS.text,
-    letterSpacing: TYPOGRAPHY.letterSpacing.tight,
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#111827',
+    letterSpacing: -0.5,
   },
   headerBadge: {
     backgroundColor: COLORS.error,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: RADIUS.full,
-    marginLeft: SPACING.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
   headerBadgeText: {
-    fontSize: TYPOGRAPHY.sizes.xs,
-    fontWeight: TYPOGRAPHY.weights.bold,
+    fontSize: 14,
+    fontWeight: '700',
     color: COLORS.white,
   },
   subtitle: {
-    fontSize: TYPOGRAPHY.sizes.sm,
+    fontSize: 14,
     color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
+    marginTop: 4,
   },
   listContent: {
     flexGrow: 1,
@@ -289,31 +333,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: SPACING['2xl'],
-    paddingVertical: SPACING['4xl'],
+    paddingHorizontal: 32,
+    paddingVertical: 60,
   },
   emptyIconContainer: {
     width: 100,
     height: 100,
-    borderRadius: RADIUS.full,
-    backgroundColor: COLORS.infoLight,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: SPACING.lg,
+    marginBottom: 20,
+    ...SHADOWS.lg,
   },
   emptyTitle: {
-    fontSize: TYPOGRAPHY.sizes.xl,
-    fontWeight: TYPOGRAPHY.weights.bold,
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 8,
     textAlign: 'center',
   },
   emptySubtext: {
-    fontSize: TYPOGRAPHY.sizes.base,
+    fontSize: 15,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    lineHeight: TYPOGRAPHY.sizes.base * TYPOGRAPHY.lineHeights.relaxed,
-    marginBottom: SPACING.xl,
+    lineHeight: 22,
+    marginBottom: 24,
   },
   actionButton: {
     minWidth: 200,

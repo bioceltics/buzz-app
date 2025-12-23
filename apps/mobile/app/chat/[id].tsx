@@ -48,7 +48,7 @@ export default function ChatScreen() {
   const [isTyping, setIsTyping] = useState(false);
 
   // Fetch conversation details
-  const { data: conversation, isLoading: loadingConversation } = useQuery({
+  const { data: conversation, isLoading: loadingConversation, error: conversationError } = useQuery({
     queryKey: ['conversation', id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -59,6 +59,7 @@ export default function ChatScreen() {
       if (error) throw error;
       return data as Conversation;
     },
+    enabled: !!id,
   });
 
   // Fetch messages
@@ -244,6 +245,18 @@ export default function ChatScreen() {
     );
   }
 
+  if (conversationError || (!loadingConversation && !conversation)) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Ionicons name="alert-circle-outline" size={48} color={Colors.error || '#EF4444'} />
+        <Text style={styles.errorText}>Conversation not found</Text>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backLink}>
+          <Text style={styles.backLinkText}>Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -332,6 +345,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: Colors.text,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  backLink: {
+    marginTop: 8,
+    padding: 12,
+  },
+  backLinkText: {
+    fontSize: 16,
+    color: Colors.primary,
+    fontWeight: '600',
   },
   header: {
     flexDirection: 'row',
