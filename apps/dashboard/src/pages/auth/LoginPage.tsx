@@ -1,89 +1,20 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, Building2, Sparkles, Home } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, Home } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/hooks/useAuth';
 
-// Landing page URL
 const LANDING_URL = 'https://buzzee.ca';
-
-// Buzzee Logo Component
-function BuzzeeLogo({ className = "w-8 h-8" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="40" height="40" rx="10" className="fill-primary-500" />
-      <text
-        x="20"
-        y="27"
-        fontSize="22"
-        fontWeight="bold"
-        fill="white"
-        textAnchor="middle"
-        fontFamily="system-ui, -apple-system, sans-serif"
-      >
-        B
-      </text>
-    </svg>
-  );
-}
 
 interface LoginForm {
   email: string;
   password: string;
 }
 
-// Animation variants
-const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-};
-
-const fadeIn = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-};
-
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 1, scale: 1 },
-};
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-};
-
-const inputFocus = {
-  scale: 1.02,
-  transition: { type: "spring", stiffness: 300, damping: 20 }
-};
-
-const buttonTap = {
-  scale: 0.97,
-};
-
-const floatingAnimation = {
-  y: [-10, 10],
-  transition: {
-    y: {
-      duration: 3,
-      repeat: Infinity,
-      repeatType: "reverse" as const,
-      ease: "easeInOut",
-    },
-  },
-};
-
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
   const { signIn } = useAuth();
   const navigate = useNavigate();
 
@@ -107,388 +38,157 @@ export function LoginPage() {
   };
 
   return (
-    <motion.div
-      initial="initial"
-      animate="animate"
-      variants={staggerContainer}
-      className="relative"
-    >
-      {/* Back to Landing Page Header */}
-      <motion.div
-        variants={fadeInUp}
-        className="flex items-center justify-between mb-8"
+    <div className="w-full">
+      {/* Back to Home Link */}
+      <a
+        href={LANDING_URL}
+        className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary-500 transition-colors mb-8"
       >
-        <a
-          href={LANDING_URL}
-          className="flex items-center gap-3 group"
-        >
-          <BuzzeeLogo className="w-10 h-10" />
-          <div>
-            <span className="text-xl font-bold text-gray-900">Buzzee</span>
-            <span className="block text-xs text-gray-500">Business Portal</span>
-          </div>
-        </a>
-        <motion.a
-          href={LANDING_URL}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 bg-gray-50 hover:bg-primary-50 rounded-full transition-colors"
-        >
-          <Home className="w-4 h-4" />
-          Back to Home
-        </motion.a>
-      </motion.div>
-
-      {/* Decorative floating elements */}
-      <motion.div
-        animate={floatingAnimation}
-        className="absolute -top-20 -right-20 w-40 h-40 bg-primary-100/50 rounded-full blur-3xl pointer-events-none"
-      />
-      <motion.div
-        animate={{
-          ...floatingAnimation,
-          transition: { ...floatingAnimation.transition, delay: 1 },
-        }}
-        className="absolute -bottom-20 -left-20 w-32 h-32 bg-secondary-100/50 rounded-full blur-3xl pointer-events-none"
-      />
-
-      {/* Mobile Logo */}
-      <motion.div
-        variants={fadeInUp}
-        className="lg:hidden text-center mb-10"
-      >
-        <motion.div
-          whileHover={{ scale: 1.05, rotate: 5 }}
-          whileTap={{ scale: 0.95 }}
-          className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-500 shadow-lg shadow-primary-500/25 mb-4 relative overflow-hidden group cursor-pointer"
-        >
-          <motion.div
-            className="absolute inset-0 bg-white/20"
-            initial={{ x: '-100%', opacity: 0 }}
-            whileHover={{ x: '100%', opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          />
-          <span className="text-white font-bold text-2xl relative z-10">B</span>
-        </motion.div>
-        <motion.h1
-          variants={fadeInUp}
-          className="text-3xl font-bold text-gray-900"
-        >
-          Buzzee
-        </motion.h1>
-        <motion.p
-          variants={fadeInUp}
-          className="text-gray-500 mt-1"
-        >
-          Venue Dashboard
-        </motion.p>
-      </motion.div>
+        <Home className="w-4 h-4" />
+        Back to Buzzee.ca
+      </a>
 
       {/* Header */}
-      <motion.div
-        variants={staggerContainer}
-        className="text-center mb-10"
-      >
-        <motion.div
-          variants={scaleIn}
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          transition={{ type: "spring", stiffness: 300 }}
-          className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary-50 mb-4 relative"
-        >
-          <Building2 className="w-7 h-7 text-primary-500" />
-          <motion.div
-            className="absolute -top-1 -right-1"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.5, type: "spring" }}
-          >
-            <Sparkles className="w-4 h-4 text-warning-400" />
-          </motion.div>
-        </motion.div>
-        <motion.h2
-          variants={fadeInUp}
-          className="text-2xl font-bold text-gray-900"
-        >
-          Welcome back
-        </motion.h2>
-        <motion.p
-          variants={fadeInUp}
-          className="mt-2 text-gray-500"
-        >
-          Sign in to manage your venue and deals
-        </motion.p>
-      </motion.div>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">
+          Sign in to your account
+        </h1>
+        <p className="mt-2 text-gray-500">
+          Welcome back! Enter your credentials to continue.
+        </p>
+      </div>
 
-      <motion.form
-        variants={staggerContainer}
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-5"
-      >
+      {/* Form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Email Field */}
-        <motion.div variants={fadeInUp}>
-          <label htmlFor="email" className="label">
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
             Email address
           </label>
-          <motion.div
-            className="relative"
-            animate={focusedField === 'email' ? inputFocus : {}}
-          >
-            <motion.div
-              className="absolute left-4 top-1/2 -translate-y-1/2"
-              animate={{
-                color: focusedField === 'email' ? '#FF6B35' : '#9CA3AF',
-              }}
-            >
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
               <Mail className="w-5 h-5" />
-            </motion.div>
+            </div>
             <input
               id="email"
               type="email"
               autoComplete="email"
-              className={`input pl-12 transition-all duration-300 ${
-                errors.email ? 'input-error' : ''
-              } ${focusedField === 'email' ? 'ring-2 ring-primary-500/20 border-primary-500' : ''}`}
+              className={`w-full pl-10 pr-4 py-3 border rounded-xl bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all ${
+                errors.email ? 'border-red-500' : 'border-gray-200'
+              }`}
               placeholder="you@example.com"
               {...register('email', {
                 required: 'Email is required',
                 pattern: {
                   value: /\S+@\S+\.\S+/,
-                  message: 'Invalid email format',
+                  message: 'Please enter a valid email',
                 },
               })}
-              onFocus={() => setFocusedField('email')}
-              onBlur={() => setFocusedField(null)}
             />
-          </motion.div>
-          <AnimatePresence>
-            {errors.email && (
-              <motion.p
-                initial={{ opacity: 0, y: -10, height: 0 }}
-                animate={{ opacity: 1, y: 0, height: 'auto' }}
-                exit={{ opacity: 0, y: -10, height: 0 }}
-                className="mt-2 text-sm text-error-600 flex items-center gap-1 overflow-hidden"
-              >
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="w-1 h-1 rounded-full bg-error-500"
-                />
-                {errors.email.message}
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </motion.div>
+          </div>
+          {errors.email && (
+            <p className="mt-1.5 text-sm text-red-500">{errors.email.message}</p>
+          )}
+        </div>
 
         {/* Password Field */}
-        <motion.div variants={fadeInUp}>
-          <label htmlFor="password" className="label">
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
             Password
           </label>
-          <motion.div
-            className="relative"
-            animate={focusedField === 'password' ? inputFocus : {}}
-          >
-            <motion.div
-              className="absolute left-4 top-1/2 -translate-y-1/2"
-              animate={{
-                color: focusedField === 'password' ? '#FF6B35' : '#9CA3AF',
-              }}
-            >
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
               <Lock className="w-5 h-5" />
-            </motion.div>
+            </div>
             <input
               id="password"
               type={showPassword ? 'text' : 'password'}
               autoComplete="current-password"
-              className={`input pl-12 pr-12 transition-all duration-300 ${
-                errors.password ? 'input-error' : ''
-              } ${focusedField === 'password' ? 'ring-2 ring-primary-500/20 border-primary-500' : ''}`}
-              placeholder="••••••••"
+              className={`w-full pl-10 pr-12 py-3 border rounded-xl bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all ${
+                errors.password ? 'border-red-500' : 'border-gray-200'
+              }`}
+              placeholder="Enter your password"
               {...register('password', {
                 required: 'Password is required',
               })}
-              onFocus={() => setFocusedField('password')}
-              onBlur={() => setFocusedField(null)}
             />
-            <motion.button
+            <button
               type="button"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               onClick={() => setShowPassword(!showPassword)}
             >
-              <AnimatePresence mode="wait">
-                {showPassword ? (
-                  <motion.div
-                    key="eyeOff"
-                    initial={{ opacity: 0, rotate: -90 }}
-                    animate={{ opacity: 1, rotate: 0 }}
-                    exit={{ opacity: 0, rotate: 90 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    <EyeOff className="w-5 h-5" />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="eye"
-                    initial={{ opacity: 0, rotate: -90 }}
-                    animate={{ opacity: 1, rotate: 0 }}
-                    exit={{ opacity: 0, rotate: 90 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    <Eye className="w-5 h-5" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.button>
-          </motion.div>
-          <AnimatePresence>
-            {errors.password && (
-              <motion.p
-                initial={{ opacity: 0, y: -10, height: 0 }}
-                animate={{ opacity: 1, y: 0, height: 'auto' }}
-                exit={{ opacity: 0, y: -10, height: 0 }}
-                className="mt-2 text-sm text-error-600 flex items-center gap-1 overflow-hidden"
-              >
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="w-1 h-1 rounded-full bg-error-500"
-                />
-                {errors.password.message}
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </motion.div>
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
+          {errors.password && (
+            <p className="mt-1.5 text-sm text-red-500">{errors.password.message}</p>
+          )}
+        </div>
 
-        {/* Remember & Forgot */}
-        <motion.div
-          variants={fadeInUp}
-          className="flex items-center justify-between"
-        >
-          <label className="flex items-center cursor-pointer group">
-            <motion.input
+        {/* Remember Me & Forgot Password */}
+        <div className="flex items-center justify-between">
+          <label className="flex items-center cursor-pointer">
+            <input
               type="checkbox"
-              whileTap={{ scale: 0.9 }}
-              className="w-4 h-4 rounded border-2 border-gray-300 text-primary-500 focus:ring-primary-500 focus:ring-offset-0"
+              className="w-4 h-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500 focus:ring-offset-0"
             />
-            <span className="ml-2.5 text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
-              Remember me
-            </span>
+            <span className="ml-2 text-sm text-gray-600">Remember me</span>
           </label>
-          <motion.div whileHover={{ x: 2 }}>
-            <Link
-              to="/forgot-password"
-              className="text-sm text-primary-600 hover:text-primary-700 font-semibold transition-colors"
-            >
-              Forgot password?
-            </Link>
-          </motion.div>
-        </motion.div>
+          <Link
+            to="/forgot-password"
+            className="text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
         {/* Submit Button */}
-        <motion.div variants={fadeInUp}>
-          <motion.button
-            type="submit"
-            disabled={isLoading}
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={buttonTap}
-            className="btn btn-primary w-full py-3.5 text-base group relative overflow-hidden"
-          >
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
-              initial={{ x: '-100%' }}
-              whileHover={{ x: '100%' }}
-              transition={{ duration: 0.6 }}
-            />
-            <AnimatePresence mode="wait">
-              {isLoading ? (
-                <motion.div
-                  key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="content"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex items-center gap-2"
-                >
-                  Sign In
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
-        </motion.div>
-      </motion.form>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3 px-4 bg-primary-500 text-white font-semibold rounded-xl hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+        >
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <>
+              Sign In
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
+        </button>
+      </form>
 
       {/* Divider */}
-      <motion.div
-        variants={fadeIn}
-        className="relative my-8"
-      >
+      <div className="relative my-8">
         <div className="absolute inset-0 flex items-center">
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="w-full border-t border-gray-200"
-          />
+          <div className="w-full border-t border-gray-200" />
         </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6 }}
-          className="relative flex justify-center text-sm"
-        >
-          <span className="px-4 bg-white text-gray-500">New to Buzzee?</span>
-        </motion.div>
-      </motion.div>
+        <div className="relative flex justify-center">
+          <span className="px-4 bg-gray-50 text-sm text-gray-500">New to Buzzee?</span>
+        </div>
+      </div>
 
       {/* Register Link */}
-      <motion.div
-        variants={fadeInUp}
-        whileHover={{ scale: 1.02 }}
-        whileTap={buttonTap}
+      <Link
+        to="/register"
+        className="w-full py-3 px-4 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:border-primary-500 hover:text-primary-500 transition-all flex items-center justify-center gap-2"
       >
-        <Link
-          to="/register"
-          className="btn btn-outline w-full py-3 group"
-        >
-          Create a venue account
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </Link>
-      </motion.div>
+        Create a venue account
+        <ArrowRight className="w-4 h-4" />
+      </Link>
 
       {/* Footer */}
-      <motion.p
-        variants={fadeIn}
-        transition={{ delay: 0.7 }}
-        className="mt-8 text-center text-xs text-gray-400"
-      >
+      <p className="mt-8 text-center text-xs text-gray-400">
         By signing in, you agree to our{' '}
-        <motion.a
-          href="#"
-          whileHover={{ color: '#FF6B35' }}
-          className="text-gray-600 transition-colors"
-        >
+        <a href="#" className="text-gray-600 hover:text-primary-500 transition-colors">
           Terms of Service
-        </motion.a>{' '}
+        </a>{' '}
         and{' '}
-        <motion.a
-          href="#"
-          whileHover={{ color: '#FF6B35' }}
-          className="text-gray-600 transition-colors"
-        >
+        <a href="#" className="text-gray-600 hover:text-primary-500 transition-colors">
           Privacy Policy
-        </motion.a>
-      </motion.p>
-    </motion.div>
+        </a>
+      </p>
+    </div>
   );
 }
