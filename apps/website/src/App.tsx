@@ -24,9 +24,9 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-// Business portal URLs (clean URLs that redirect to dashboard)
-const BUSINESS_LOGIN_URL = '/business-login';
-const BUSINESS_REGISTER_URL = '/business-register';
+// Business portal URLs (subdomain)
+const BUSINESS_LOGIN_URL = 'https://business.buzzee.ca/login';
+const BUSINESS_REGISTER_URL = 'https://business.buzzee.ca/register';
 
 // Custom Buzzee Logo Icon - Simple B letter
 function BuzzeeIcon({ className = "w-6 h-6" }: { className?: string }) {
