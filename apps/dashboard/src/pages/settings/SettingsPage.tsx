@@ -461,7 +461,7 @@ export function SettingsPage() {
                   <h4 className="text-lg font-semibold text-gray-900">Starter</h4>
                   <p className="text-sm text-gray-500 mt-1">For small venues testing the platform</p>
                   <p className="text-3xl font-bold text-gray-900 mt-4">
-                    $99<span className="text-lg font-normal text-gray-500">/month</span>
+                    $50<span className="text-lg font-normal text-gray-500">/month</span>
                   </p>
                   <ul className="mt-6 space-y-3 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
@@ -497,7 +497,7 @@ export function SettingsPage() {
                   </div>
                   <p className="text-sm text-gray-500 mt-1">For active venues maximizing traffic</p>
                   <p className="text-3xl font-bold text-gray-900 mt-4">
-                    $199<span className="text-lg font-normal text-gray-500">/month</span>
+                    $100<span className="text-lg font-normal text-gray-500">/month</span>
                   </p>
                   <ul className="mt-6 space-y-3 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
