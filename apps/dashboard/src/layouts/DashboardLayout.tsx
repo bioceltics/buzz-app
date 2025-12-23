@@ -44,7 +44,7 @@ export function DashboardLayout() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/login');
+    window.location.href = 'https://buzzee.ca';
   };
 
   // Get current page title
