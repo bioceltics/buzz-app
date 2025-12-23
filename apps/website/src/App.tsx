@@ -662,15 +662,6 @@ function ForBusinessSection() {
     },
   ];
 
-  const pricingFeatures = [
-    'Unlimited daily deals',
-    'Set redemption limits per deal',
-    'Schedule start & end times',
-    'Pause or stop deals anytime',
-    'Real-time analytics dashboard',
-    'QR code verification',
-  ];
-
   return (
     <section id="for-business" className="py-24 px-4 bg-gray-900 text-white relative overflow-hidden">
       {/* Background pattern */}
