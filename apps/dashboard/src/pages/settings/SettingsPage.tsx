@@ -132,9 +132,29 @@ export function SettingsPage() {
         <p className="text-gray-600">Manage your venue settings and preferences</p>
       </div>
 
-      <div className="flex gap-8">
-        {/* Sidebar */}
-        <div className="w-64 shrink-0">
+      {/* Mobile Tab Navigation */}
+      <div className="lg:hidden mb-6 overflow-x-auto">
+        <div className="flex gap-2 pb-2">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+        {/* Sidebar - Desktop Only */}
+        <div className="hidden lg:block w-64 shrink-0">
           <nav className="space-y-1">
             {tabs.map((tab) => (
               <button
@@ -154,7 +174,7 @@ export function SettingsPage() {
         </div>
 
         {/* Content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="card">
@@ -196,7 +216,7 @@ export function SettingsPage() {
                     {...register('address')}
                   />
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="label">City</label>
                     <input
@@ -225,7 +245,7 @@ export function SettingsPage() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="label">Phone</label>
                     <input
@@ -271,14 +291,25 @@ export function SettingsPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-6">Operating Hours</h3>
               <div className="space-y-4">
                 {DAYS_OF_WEEK.map((day) => (
-                  <div key={day} className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-0">
-                    <div className="w-32">
+                  <div key={day} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 py-3 border-b border-gray-100 last:border-0">
+                    <div className="flex items-center justify-between sm:w-32">
                       <span className="font-medium text-gray-900 capitalize">{day}</span>
+                      <button
+                        type="button"
+                        onClick={() => toggleDay(day)}
+                        className={`sm:hidden px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                          hours[day]?.isOpen
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-500'
+                        }`}
+                      >
+                        {hours[day]?.isOpen ? 'Open' : 'Closed'}
+                      </button>
                     </div>
                     <button
                       type="button"
                       onClick={() => toggleDay(day)}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      className={`hidden sm:block px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                         hours[day]?.isOpen
                           ? 'bg-green-100 text-green-700'
                           : 'bg-gray-100 text-gray-500'
@@ -292,14 +323,14 @@ export function SettingsPage() {
                           type="time"
                           value={hours[day]?.openTime || '09:00'}
                           onChange={(e) => updateTime(day, 'openTime', e.target.value)}
-                          className="input w-32 text-sm"
+                          className="input w-28 sm:w-32 text-sm"
                         />
                         <span className="text-gray-400">to</span>
                         <input
                           type="time"
                           value={hours[day]?.closeTime || '17:00'}
                           onChange={(e) => updateTime(day, 'closeTime', e.target.value)}
-                          className="input w-32 text-sm"
+                          className="input w-28 sm:w-32 text-sm"
                         />
                       </div>
                     )}
@@ -365,7 +396,7 @@ export function SettingsPage() {
               {/* Gallery */}
               <div>
                 <label className="label">Gallery Images</label>
-                <div className="grid grid-cols-4 gap-4 mb-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mb-3">
                   {venue?.images?.map((img: string, idx: number) => (
                     <div key={idx} className="aspect-square rounded-lg bg-gray-100 overflow-hidden">
                       <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
@@ -455,7 +486,7 @@ export function SettingsPage() {
               </div>
 
               {/* Pricing Tiers */}
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
                 {/* Starter Plan */}
                 <div className="border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors">
                   <h4 className="text-lg font-semibold text-gray-900">Starter</h4>

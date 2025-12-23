@@ -175,14 +175,14 @@ export function AdminVenuesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Manage Venues</h1>
           <p className="text-gray-600">Review and approve venue applications</p>
         </div>
         <button
           onClick={fetchVenues}
-          className="btn btn-outline flex items-center"
+          className="btn btn-outline flex items-center justify-center w-full sm:w-auto"
           disabled={isLoading}
         >
           <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
@@ -233,28 +233,43 @@ export function AdminVenuesPage() {
         <div className="space-y-4">
           {venues.map((venue) => (
             <div key={venue.id} className="card">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Building2 className="w-8 h-8 text-gray-400" />
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{venue.name}</h3>
-                    <p className="text-sm text-gray-500">{venue.address}</p>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2 sm:block">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{venue.name}</h3>
+                      <span
+                        className={`sm:hidden px-2 py-0.5 rounded-full text-xs font-medium capitalize flex-shrink-0 ${
+                          venue.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : venue.status === 'approved'
+                            ? 'bg-green-100 text-green-700'
+                            : venue.status === 'suspended'
+                            ? 'bg-orange-100 text-orange-700'
+                            : 'bg-red-100 text-red-700'
+                        }`}
+                      >
+                        {venue.status}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500 truncate">{venue.address}</p>
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-gray-600">
                       <span className="capitalize">{venue.type}</span>
-                      <span>•</span>
-                      <span>Submitted {formatDate(venue.created_at)}</span>
+                      <span className="hidden sm:inline">•</span>
+                      <span>{formatDate(venue.created_at)}</span>
                       {venue.owner && (
                         <>
-                          <span>•</span>
-                          <span>Owner: {venue.owner.full_name || venue.owner.email}</span>
+                          <span className="hidden sm:inline">•</span>
+                          <span className="hidden sm:inline">Owner: {venue.owner.full_name || venue.owner.email}</span>
                         </>
                       )}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${
                       venue.status === 'pending'
@@ -271,45 +286,45 @@ export function AdminVenuesPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-200">
-                <button className="btn btn-outline flex items-center">
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Details
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4 pt-4 border-t border-gray-200">
+                <button className="btn btn-outline flex items-center text-sm flex-1 sm:flex-none justify-center">
+                  <Eye className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">View Details</span>
                 </button>
 
                 {venue.status === 'pending' && (
                   <>
                     <button
-                      className="btn btn-primary flex items-center"
+                      className="btn btn-primary flex items-center text-sm flex-1 sm:flex-none justify-center"
                       onClick={() => handleApprove(venue.id)}
                       disabled={actionLoading === venue.id}
                     >
                       {actionLoading === venue.id ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Loader2 className="w-4 h-4 sm:mr-2 animate-spin" />
                       ) : (
-                        <Check className="w-4 h-4 mr-2" />
+                        <Check className="w-4 h-4 sm:mr-2" />
                       )}
-                      Approve
+                      <span className="hidden sm:inline">Approve</span>
                     </button>
                     <button
-                      className="btn bg-red-600 text-white hover:bg-red-700 flex items-center"
+                      className="btn bg-red-600 text-white hover:bg-red-700 flex items-center text-sm flex-1 sm:flex-none justify-center"
                       onClick={() => setShowRejectModal(venue.id)}
                       disabled={actionLoading === venue.id}
                     >
-                      <X className="w-4 h-4 mr-2" />
-                      Reject
+                      <X className="w-4 h-4 sm:mr-2" />
+                      <span className="hidden sm:inline">Reject</span>
                     </button>
                   </>
                 )}
 
                 {venue.status === 'approved' && (
                   <button
-                    className="btn bg-orange-600 text-white hover:bg-orange-700 flex items-center"
+                    className="btn bg-orange-600 text-white hover:bg-orange-700 flex items-center text-sm flex-1 sm:flex-none justify-center"
                     onClick={() => setShowSuspendModal(venue.id)}
                     disabled={actionLoading === venue.id}
                   >
-                    <Ban className="w-4 h-4 mr-2" />
-                    Suspend
+                    <Ban className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Suspend</span>
                   </button>
                 )}
               </div>
