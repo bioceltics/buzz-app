@@ -721,7 +721,7 @@ function ForBusinessSection() {
                   <p className="text-sm text-gray-400">For small venues testing the platform</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-3xl font-bold text-white">$50</span>
+                  <span className="text-3xl font-bold text-white">$49.99</span>
                   <span className="text-gray-400">/mo</span>
                 </div>
               </div>
@@ -743,7 +743,7 @@ function ForBusinessSection() {
                   <p className="text-sm text-gray-300">For active venues maximizing traffic</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-3xl font-bold text-white">$100</span>
+                  <span className="text-3xl font-bold text-white">$99.99</span>
                   <span className="text-gray-300">/mo</span>
                 </div>
               </div>
