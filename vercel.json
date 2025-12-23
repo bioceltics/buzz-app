@@ -3,6 +3,10 @@
   "outputDirectory": "apps/website/dist",
   "installCommand": "npm install",
   "framework": "vite",
+  "redirects": [
+    { "source": "/business-login", "destination": "https://dashboard-lilac-delta-26.vercel.app/login", "permanent": false },
+    { "source": "/business-register", "destination": "https://dashboard-lilac-delta-26.vercel.app/register", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

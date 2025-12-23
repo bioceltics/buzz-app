@@ -24,8 +24,9 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-// Dashboard URL - production dashboard
-const DASHBOARD_URL = 'https://dashboard-lilac-delta-26.vercel.app';
+// Business portal URLs (clean URLs that redirect to dashboard)
+const BUSINESS_LOGIN_URL = '/business-login';
+const BUSINESS_REGISTER_URL = '/business-register';
 
 // Custom Buzzee Logo Icon - Simple B letter
 function BuzzeeIcon({ className = "w-6 h-6" }: { className?: string }) {
@@ -80,7 +81,7 @@ function Navigation() {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
             <a
-              href={`${DASHBOARD_URL}/login`}
+              href={BUSINESS_LOGIN_URL}
               className="text-gray-700 font-semibold hover:text-primary-500 transition-colors"
             >
               Business Login
@@ -110,7 +111,7 @@ function Navigation() {
               <a href="#how-it-works" className="text-gray-600 font-medium py-2 hover:text-primary-500 transition-colors">How It Works</a>
               <a href="#for-business" className="text-gray-600 font-medium py-2 hover:text-primary-500 transition-colors">For Business</a>
               <a href="#download" className="text-gray-600 font-medium py-2 hover:text-primary-500 transition-colors">Download</a>
-              <a href={`${DASHBOARD_URL}/login`} className="text-primary-500 font-semibold py-2">
+              <a href={BUSINESS_LOGIN_URL} className="text-primary-500 font-semibold py-2">
                 Business Login
               </a>
             </div>
@@ -703,7 +704,7 @@ function ForBusinessSection() {
             </div>
 
             <a
-              href={`${DASHBOARD_URL}/register`}
+              href={BUSINESS_REGISTER_URL}
               className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary-500 text-white font-semibold rounded-full shadow-lg shadow-primary-500/25 hover:bg-primary-400 transition-all hover:shadow-xl"
             >
               Get Started Free
@@ -753,7 +754,7 @@ function ForBusinessSection() {
                 ))}
               </div>
               <a
-                href={`${DASHBOARD_URL}/register`}
+                href={BUSINESS_REGISTER_URL}
                 className="block w-full py-3 bg-primary-500 text-white font-semibold rounded-xl text-center hover:bg-primary-400 transition-colors"
               >
                 Start Free Trial

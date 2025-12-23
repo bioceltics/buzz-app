@@ -2,9 +2,32 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, Building2, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, Building2, Sparkles, Home } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/hooks/useAuth';
+
+// Landing page URL
+const LANDING_URL = 'https://buzzee.ca';
+
+// Buzzee Logo Component
+function BuzzeeLogo({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="10" className="fill-primary-500" />
+      <text
+        x="20"
+        y="27"
+        fontSize="22"
+        fontWeight="bold"
+        fill="white"
+        textAnchor="middle"
+        fontFamily="system-ui, -apple-system, sans-serif"
+      >
+        B
+      </text>
+    </svg>
+  );
+}
 
 interface LoginForm {
   email: string;
@@ -90,6 +113,32 @@ export function LoginPage() {
       variants={staggerContainer}
       className="relative"
     >
+      {/* Back to Landing Page Header */}
+      <motion.div
+        variants={fadeInUp}
+        className="flex items-center justify-between mb-8"
+      >
+        <a
+          href={LANDING_URL}
+          className="flex items-center gap-3 group"
+        >
+          <BuzzeeLogo className="w-10 h-10" />
+          <div>
+            <span className="text-xl font-bold text-gray-900">Buzzee</span>
+            <span className="block text-xs text-gray-500">Business Portal</span>
+          </div>
+        </a>
+        <motion.a
+          href={LANDING_URL}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 bg-gray-50 hover:bg-primary-50 rounded-full transition-colors"
+        >
+          <Home className="w-4 h-4" />
+          Back to Home
+        </motion.a>
+      </motion.div>
+
       {/* Decorative floating elements */}
       <motion.div
         animate={floatingAnimation}
