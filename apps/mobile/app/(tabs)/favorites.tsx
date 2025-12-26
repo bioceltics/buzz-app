@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  SafeAreaView,
   StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -24,16 +24,11 @@ export default function FavoritesScreen() {
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
+        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
         {/* Header with Logo */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <LinearGradient
-              colors={[COLORS.primary, '#D81B60']}
-              style={styles.logoContainer}
-            >
-              <BuzzeeIcon size={18} color={COLORS.white} />
-            </LinearGradient>
+            <BuzzeeIcon size={40} showBackground />
             <Text style={styles.logoText}>Buzzee</Text>
           </View>
         </View>
@@ -61,17 +56,12 @@ export default function FavoritesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       {/* Header with Logo */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <View style={styles.headerLeft}>
-            <LinearGradient
-              colors={[COLORS.primary, '#D81B60']}
-              style={styles.logoContainer}
-            >
-              <BuzzeeIcon size={18} color={COLORS.white} />
-            </LinearGradient>
+            <BuzzeeIcon size={40} showBackground />
             <Text style={styles.logoText}>Buzzee</Text>
           </View>
           {favorites.length > 0 && (

@@ -7,11 +7,11 @@ import {
   RefreshControl,
   TextInput,
   Pressable,
-  SafeAreaView,
   StatusBar,
   Animated,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -19,7 +19,7 @@ import { DealCard } from '@/components/deals/DealCard';
 import { BuzzeeIcon } from '@/components/ui/BuzzeeIcon';
 import { useDeals } from '@/hooks/useDeals';
 import { useLocation } from '@/hooks/useLocation';
-import { COLORS, SPACING } from '@/constants/colors';
+import { COLORS, SPACING, SHADOWS } from '@/constants/colors';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -30,7 +30,6 @@ const CATEGORIES = [
   { id: 'club', label: 'Clubs' },
   { id: 'cafe', label: 'Cafes' },
   { id: 'hotel', label: 'Hotels' },
-  { id: 'car_rental', label: 'Car Rentals' },
 ];
 
 export default function DiscoverScreen() {
@@ -167,20 +166,13 @@ export default function DiscoverScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
       {/* Header */}
       <View style={styles.appHeader}>
-        <View style={styles.logoContainer}>
-          <LinearGradient
-            colors={[COLORS.primary, '#F06292']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.logoIcon}
-          >
-            <BuzzeeIcon size={24} color={COLORS.white} />
-          </LinearGradient>
-          <Text style={styles.brandName}>Buzzee</Text>
+        <View style={styles.logoWrapper}>
+          <BuzzeeIcon size={40} showBackground />
+          <Text style={styles.logoText}>Buzzee</Text>
         </View>
         <Pressable
           style={styles.notificationButton}
@@ -236,23 +228,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
-  logoContainer: {
+  logoWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  logoIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+  logoContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    ...SHADOWS.md,
   },
-  brandName: {
-    fontSize: 20,
+  logoText: {
+    fontSize: 22,
     fontWeight: '700',
-    color: COLORS.text,
+    color: '#111827',
     marginLeft: 10,
-    letterSpacing: -0.3,
+    letterSpacing: -0.5,
   },
   notificationButton: {
     width: 42,

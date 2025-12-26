@@ -21,7 +21,7 @@ import { Button } from '@/components/ui';
 import { useVenues } from '@/hooks/useVenues';
 import { useLocation } from '@/hooks/useLocation';
 import { useFavorites } from '@/hooks/useFavorites';
-import { COLORS, TYPOGRAPHY, SPACING, RADIUS } from '@/constants/colors';
+import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 
 const VENUE_CATEGORIES = [
   { id: 'all', label: 'All', icon: 'grid-outline' },
@@ -225,12 +225,7 @@ export default function VenuesBrowseScreen() {
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </Pressable>
         <View style={styles.headerTitleContainer}>
-          <LinearGradient
-            colors={[COLORS.primary, '#D81B60']}
-            style={styles.logoContainer}
-          >
-            <BuzzeeIcon size={16} color={COLORS.white} />
-          </LinearGradient>
+          <BuzzeeIcon size={40} showBackground />
           <Text style={styles.headerTitle}>Explore Venues</Text>
         </View>
         <View style={styles.headerRight} />
@@ -301,11 +296,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   logoContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
+    ...SHADOWS.md,
   },
   headerTitle: {
     fontSize: 20,

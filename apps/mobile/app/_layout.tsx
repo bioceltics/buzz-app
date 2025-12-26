@@ -6,6 +6,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { StyleSheet, LogBox } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AnimatedSplashScreen from '@/components/splash/AnimatedSplashScreen';
 
 // Ignore known Expo SDK 52 DevLoadingView warning (development only)
@@ -59,8 +60,9 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={styles.container}>
-        <AuthProvider>
+      <SafeAreaProvider>
+        <GestureHandlerRootView style={styles.container}>
+          <AuthProvider>
           <Stack
             screenOptions={{
               headerShown: false,
@@ -102,9 +104,10 @@ export default function RootLayout() {
               }}
             />
           </Stack>
-          <StatusBar style="auto" />
-        </AuthProvider>
-      </GestureHandlerRootView>
+            <StatusBar style="auto" />
+          </AuthProvider>
+        </GestureHandlerRootView>
+      </SafeAreaProvider>
     </QueryClientProvider>
   );
 }

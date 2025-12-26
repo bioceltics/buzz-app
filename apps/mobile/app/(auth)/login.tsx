@@ -149,14 +149,7 @@ export default function LoginScreen() {
                 ]}
               >
                 <View style={styles.logoContainer}>
-                  <LinearGradient
-                    colors={[COLORS.primary, '#F06292']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.logoGradient}
-                  >
-                    <BuzzeeIcon size={48} color={COLORS.white} />
-                  </LinearGradient>
+                  <BuzzeeIcon size={88} showBackground />
                 </View>
                 <Text style={styles.logo}>Buzzee</Text>
                 <Text style={styles.subtitle}>

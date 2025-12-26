@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Image,
   ScrollView,
@@ -12,6 +11,7 @@ import {
   StatusBar,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
@@ -68,16 +68,11 @@ export default function ProfileScreen() {
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
+        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
         {/* Header with Logo */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <LinearGradient
-              colors={[COLORS.primary, '#D81B60']}
-              style={styles.logoContainer}
-            >
-              <BuzzeeIcon size={18} color={COLORS.white} />
-            </LinearGradient>
+            <BuzzeeIcon size={40} showBackground />
             <Text style={styles.logoText}>Buzzee</Text>
           </View>
         </View>
@@ -111,17 +106,12 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header with Logo */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <LinearGradient
-              colors={[COLORS.primary, '#D81B60']}
-              style={styles.logoContainer}
-            >
-              <BuzzeeIcon size={18} color={COLORS.white} />
-            </LinearGradient>
+            <BuzzeeIcon size={40} showBackground />
             <Text style={styles.logoText}>Buzzee</Text>
           </View>
         </View>

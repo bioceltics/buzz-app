@@ -13,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SHADOWS } from '@/constants/colors';
+import { BuzzeeIcon } from '@/components/ui/BuzzeeIcon';
 
 interface LogoAnimationProps {
   onEntranceComplete?: () => void;
@@ -125,14 +126,7 @@ export default function LogoAnimation({ onEntranceComplete }: LogoAnimationProps
       {/* Logo container with glow */}
       <Animated.View style={[styles.logoWrapper, glowStyle]}>
         <Animated.View style={[styles.logoContainer, logoContainerStyle]}>
-          <LinearGradient
-            colors={[COLORS.primary, COLORS.primaryLight]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.logoGradient}
-          >
-            <Text style={styles.logoText}>B</Text>
-          </LinearGradient>
+          <BuzzeeIcon size={100} showBackground />
         </Animated.View>
       </Animated.View>
 
@@ -175,13 +169,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  logoText: {
-    fontSize: 56,
-    fontWeight: '800',
-    color: COLORS.white,
-    textAlign: 'center',
-    marginTop: 4,
   },
   textContainer: {
     marginTop: 24,

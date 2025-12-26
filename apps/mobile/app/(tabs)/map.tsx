@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   StatusBar,
   TouchableOpacity,
   ActivityIndicator,
@@ -14,14 +13,36 @@ import {
   Linking,
   TextInput,
   Pressable,
+  FlatList,
+  Image,
 } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 import { Button } from '@/components/ui';
 import { useVenues } from '@/hooks/useVenues';
+
+// Check if running in Expo Go (which doesn't have react-native-maps)
+const isExpoGo = Constants.appOwnership === 'expo';
+
+// Conditionally import react-native-maps only when not in Expo Go
+let MapView: any = null;
+let Marker: any = null;
+let PROVIDER_GOOGLE: any = null;
+
+if (!isExpoGo) {
+  try {
+    const maps = require('react-native-maps');
+    MapView = maps.default;
+    Marker = maps.Marker;
+    PROVIDER_GOOGLE = maps.PROVIDER_GOOGLE;
+  } catch (e) {
+    console.warn('react-native-maps not available');
+  }
+}
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -67,6 +88,7 @@ const VENUE_TYPE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
 };
 
 export default function MapScreen() {
+  const insets = useSafeAreaInsets();
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -247,9 +269,100 @@ export default function MapScreen() {
     );
   }
 
+  // Expo Go fallback - show venue list instead of map
+  if (isExpoGo || !MapView) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+        <View style={styles.expoGoHeader}>
+          <Text style={styles.expoGoTitle}>Nearby Venues</Text>
+          <Text style={styles.expoGoSubtitle}>
+            Map view requires a development build. Showing venue list instead.
+          </Text>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.expoGoSearchContainer}>
+          <View style={styles.searchBar}>
+            <Ionicons name="search" size={20} color={COLORS.textTertiary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search venues..."
+              placeholderTextColor={COLORS.textTertiary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+                <Ionicons name="close-circle" size={18} color={COLORS.textTertiary} />
+              </Pressable>
+            )}
+          </View>
+        </View>
+
+        {/* Venue List */}
+        <FlatList
+          data={filteredVenues}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.expoGoList}
+          renderItem={({ item: venue }) => (
+            <TouchableOpacity
+              style={styles.expoGoVenueCard}
+              onPress={() => handleViewDeals(venue)}
+            >
+              <View
+                style={[
+                  styles.venueTypeIcon,
+                  { backgroundColor: VENUE_TYPE_COLORS[venue.type] }
+                ]}
+              >
+                <Ionicons
+                  name={VENUE_TYPE_ICONS[venue.type]}
+                  size={20}
+                  color={COLORS.white}
+                />
+              </View>
+              <View style={styles.expoGoVenueInfo}>
+                <Text style={styles.venueName}>{venue.name}</Text>
+                <Text style={styles.venueAddress}>{venue.address}</Text>
+                <View style={styles.cardMeta}>
+                  <View style={styles.metaItem}>
+                    <Ionicons name="star" size={14} color={COLORS.warning} />
+                    <Text style={styles.metaText}>{venue.rating}</Text>
+                  </View>
+                  <View style={styles.metaItem}>
+                    <Ionicons name="location" size={14} color={COLORS.textTertiary} />
+                    <Text style={styles.metaText}>
+                      {venue.distance ? `${(venue.distance / 1000).toFixed(1)} km` : 'Nearby'}
+                    </Text>
+                  </View>
+                  {venue.activeDealCount > 0 && (
+                    <View style={[styles.metaItem, styles.dealMeta]}>
+                      <Ionicons name="pricetag" size={14} color={COLORS.success} />
+                      <Text style={[styles.metaText, { color: COLORS.success }]}>
+                        {venue.activeDealCount} deals
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={COLORS.textTertiary} />
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={
+            <View style={styles.expoGoEmpty}>
+              <Ionicons name="location-outline" size={48} color={COLORS.textTertiary} />
+              <Text style={styles.expoGoEmptyText}>No venues found nearby</Text>
+            </View>
+          }
+        />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
       {/* Map */}
       <MapView
@@ -282,7 +395,7 @@ export default function MapScreen() {
       </MapView>
 
       {/* Header */}
-      <SafeAreaView style={styles.headerContainer}>
+      <View style={[styles.headerContainer, { paddingTop: insets.top }]}>
         <View style={styles.header}>
           <View style={styles.searchBar}>
             <Ionicons name="search" size={20} color={COLORS.textTertiary} />
@@ -343,7 +456,7 @@ export default function MapScreen() {
             ))}
           </ScrollView>
         )}
-      </SafeAreaView>
+      </View>
 
       {/* Center on user button */}
       <TouchableOpacity style={styles.centerButton} onPress={centerOnUser}>
@@ -710,5 +823,53 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '500',
     color: COLORS.white,
+  },
+  // Expo Go fallback styles
+  expoGoHeader: {
+    padding: SPACING.base,
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  expoGoTitle: {
+    fontSize: TYPOGRAPHY.sizes.xl,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: SPACING.xs,
+  },
+  expoGoSubtitle: {
+    fontSize: TYPOGRAPHY.sizes.sm,
+    color: COLORS.textSecondary,
+  },
+  expoGoSearchContainer: {
+    padding: SPACING.base,
+    backgroundColor: COLORS.white,
+  },
+  expoGoList: {
+    padding: SPACING.base,
+    paddingBottom: SPACING['2xl'],
+  },
+  expoGoVenueCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    padding: SPACING.base,
+    borderRadius: RADIUS.lg,
+    marginBottom: SPACING.sm,
+    ...SHADOWS.sm,
+  },
+  expoGoVenueInfo: {
+    flex: 1,
+    marginLeft: SPACING.md,
+  },
+  expoGoEmpty: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING['3xl'],
+  },
+  expoGoEmptyText: {
+    marginTop: SPACING.base,
+    fontSize: TYPOGRAPHY.sizes.base,
+    color: COLORS.textSecondary,
   },
 });
