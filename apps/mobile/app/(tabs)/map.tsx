@@ -12,6 +12,8 @@ import {
   Dimensions,
   ScrollView,
   Linking,
+  TextInput,
+  Pressable,
 } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +21,7 @@ import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 import { Button } from '@/components/ui';
+import { useVenues } from '@/hooks/useVenues';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -63,67 +66,44 @@ const VENUE_TYPE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   hotel: 'bed',
 };
 
-// Mock data for venues - will be replaced with API call
-const MOCK_VENUES: Venue[] = [
-  {
-    id: '1',
-    name: 'The Golden Tap',
-    type: 'bar',
-    latitude: 37.7849,
-    longitude: -122.4094,
-    address: '123 Market St, San Francisco',
-    rating: 4.5,
-    activeDealCount: 3,
-    deals: [
-      { id: 'd1', title: 'Happy Hour 50% Off', discountType: 'percentage', discountValue: 50, endTime: '2024-12-31T19:00:00Z' },
-    ],
-  },
-  {
-    id: '2',
-    name: 'Bella Italia',
-    type: 'restaurant',
-    latitude: 37.7869,
-    longitude: -122.4054,
-    address: '456 Union Square, San Francisco',
-    rating: 4.8,
-    activeDealCount: 2,
-    deals: [
-      { id: 'd2', title: 'Lunch Special $10 Off', discountType: 'fixed', discountValue: 10, endTime: '2024-12-31T14:00:00Z' },
-    ],
-  },
-  {
-    id: '3',
-    name: 'Club Neon',
-    type: 'club',
-    latitude: 37.7829,
-    longitude: -122.4114,
-    address: '789 SOMA Blvd, San Francisco',
-    rating: 4.2,
-    activeDealCount: 1,
-    deals: [
-      { id: 'd3', title: 'Free Entry Before 10PM', discountType: 'free_item', discountValue: 0, endTime: '2024-12-31T22:00:00Z' },
-    ],
-  },
-  {
-    id: '4',
-    name: 'Morning Brew',
-    type: 'cafe',
-    latitude: 37.7879,
-    longitude: -122.4024,
-    address: '321 Coffee Lane, San Francisco',
-    rating: 4.7,
-    activeDealCount: 4,
-  },
-];
-
 export default function MapScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [venues, setVenues] = useState<Venue[]>([]);
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  // Debounce search query to prevent keyboard dismissal
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch real venues from Supabase
+  const { venues: fetchedVenues, isLoading: venuesLoading, refetch: refetchVenues } = useVenues({
+    latitude: location?.coords.latitude,
+    longitude: location?.coords.longitude,
+    search: debouncedSearch,
+    category: activeFilters.length === 1 ? activeFilters[0] : undefined,
+  });
+
+  // Map the venues to include activeDealCount
+  const venues: Venue[] = (fetchedVenues || []).map(v => ({
+    id: v.id,
+    name: v.name,
+    type: (v.type as Venue['type']) || 'restaurant',
+    latitude: v.latitude || 0,
+    longitude: v.longitude || 0,
+    address: v.address || '',
+    rating: v.rating || 0,
+    activeDealCount: v.review_count || 0,
+    distance: v.distance,
+  }));
 
   const mapRef = useRef<MapView>(null);
   const cardAnimation = useRef(new Animated.Value(0)).current;
@@ -145,9 +125,6 @@ export default function MapScreen() {
           accuracy: Location.Accuracy.Balanced,
         });
         setLocation(currentLocation);
-
-        // Fetch nearby venues
-        await fetchNearbyVenues(currentLocation.coords.latitude, currentLocation.coords.longitude);
       } catch (error) {
         console.error('Error getting location:', error);
         setErrorMsg('Could not get your location');
@@ -156,26 +133,6 @@ export default function MapScreen() {
       }
     })();
   }, []);
-
-  const fetchNearbyVenues = async (lat: number, lng: number) => {
-    try {
-      // TODO: Replace with actual API call when backend is ready
-      // const response = await fetch(`${API_URL}/api/venues/nearby?lat=${lat}&lng=${lng}&radius=5000`);
-      // const data = await response.json();
-      // setVenues(data.venues);
-
-      // For now, use mock data adjusted to user's location
-      const adjustedVenues = MOCK_VENUES.map((venue) => ({
-        ...venue,
-        latitude: lat + (Math.random() - 0.5) * 0.02,
-        longitude: lng + (Math.random() - 0.5) * 0.02,
-        distance: Math.round(Math.random() * 2000),
-      }));
-      setVenues(adjustedVenues);
-    } catch (error) {
-      console.error('Error fetching venues:', error);
-    }
-  };
 
   const handleMarkerPress = useCallback((venue: Venue) => {
     setSelectedVenue(venue);
@@ -240,7 +197,9 @@ export default function MapScreen() {
     );
   }, []);
 
-  const filteredVenues = activeFilters.length > 0
+  // Filter by type (useVenues handles search, but only single category)
+  // When multiple filters are selected, filter locally
+  const filteredVenues = activeFilters.length > 1
     ? venues.filter(v => activeFilters.includes(v.type))
     : venues;
 
@@ -259,7 +218,7 @@ export default function MapScreen() {
     </View>
   );
 
-  if (isLoading) {
+  if (isLoading || (location && venuesLoading)) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -327,7 +286,18 @@ export default function MapScreen() {
         <View style={styles.header}>
           <View style={styles.searchBar}>
             <Ionicons name="search" size={20} color={COLORS.textTertiary} />
-            <Text style={styles.searchPlaceholder}>Search venues...</Text>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search venues..."
+              placeholderTextColor={COLORS.textTertiary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+                <Ionicons name="close-circle" size={18} color={COLORS.textTertiary} />
+              </Pressable>
+            )}
           </View>
           <TouchableOpacity
             style={[styles.filterButton, showFilters && styles.filterButtonActive]}
@@ -548,10 +518,11 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     ...SHADOWS.md,
   },
-  searchPlaceholder: {
+  searchInput: {
+    flex: 1,
     marginLeft: SPACING.sm,
     fontSize: TYPOGRAPHY.sizes.base,
-    color: COLORS.textTertiary,
+    color: COLORS.text,
   },
   filterButton: {
     width: 48,

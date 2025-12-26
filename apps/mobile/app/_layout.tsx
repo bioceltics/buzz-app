@@ -95,6 +95,12 @@ export default function RootLayout() {
                 presentation: 'fullScreenModal',
               }}
             />
+            <Stack.Screen
+              name="venues/index"
+              options={{
+                headerShown: false,
+              }}
+            />
           </Stack>
           <StatusBar style="auto" />
         </AuthProvider>

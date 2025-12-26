@@ -116,9 +116,6 @@ export default function DiscoverScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Featured</Text>
-            <Pressable onPress={() => router.push('/deals/featured')}>
-              <Text style={styles.seeAll}>See all</Text>
-            </Pressable>
           </View>
           <FlatList
             horizontal
@@ -187,7 +184,7 @@ export default function DiscoverScreen() {
         </View>
         <Pressable
           style={styles.notificationButton}
-          onPress={() => router.push('/notifications')}
+          onPress={() => router.push('/settings/notifications')}
         >
           <Ionicons name="notifications-outline" size={22} color={COLORS.text} />
           <View style={styles.notificationDot} />

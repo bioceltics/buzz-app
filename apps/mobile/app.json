@@ -26,7 +26,11 @@
         "NSLocationWhenInUseUsageDescription": "Buzzee needs your location to show nearby deals and venues.",
         "NSLocationAlwaysUsageDescription": "Buzzee needs your location to notify you about nearby deals.",
         "NSCameraUsageDescription": "Buzzee needs camera access to scan QR codes for deal redemption.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSAllowsLocalNetworking": true
+        }
       }
     },
     "android": {

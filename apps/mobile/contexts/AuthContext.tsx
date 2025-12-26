@@ -4,9 +4,10 @@ import { supabase } from '@/services/supabase';
 import { router } from 'expo-router';
 
 interface AuthContextType {
-  user: User | null;
+  user: any | null;
   session: Session | null;
   isLoading: boolean;
+  refreshUser: () => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithPhone: (phone: string) => Promise<void>;
@@ -21,9 +22,40 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Helper function to fetch user profile from users table
+  const fetchUserProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('fetchUserProfile error:', error);
+      return null;
+    }
+    return data;
+  };
+
+  // Function to refresh user data from database
+  const refreshUser = async () => {
+    const userId = user?.id || session?.user?.id;
+    if (!userId) {
+      console.log('refreshUser: No user ID available');
+      return;
+    }
+
+    const userData = await fetchUserProfile(userId);
+    if (userData) {
+      setUser(userData);
+    } else {
+      console.log('refreshUser: fetchUserProfile returned null');
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -39,7 +71,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         setSession(session);
-        setUser(session?.user ?? null);
+
+        // Fetch user profile from users table
+        if (session?.user?.id) {
+          let userData = await fetchUserProfile(session.user.id);
+
+          // If no user record exists, create one
+          if (!userData && session.user) {
+            const { data: newUser, error: createError } = await supabase
+              .from('users')
+              .upsert({
+                id: session.user.id,
+                email: session.user.email,
+                full_name: session.user.user_metadata?.full_name || '',
+              }, { onConflict: 'id' })
+              .select()
+              .single();
+
+            if (!createError && newUser) {
+              userData = newUser;
+            } else if (createError) {
+              console.error('Error creating user record:', createError);
+            }
+          }
+
+          if (mounted) {
+            setUser(userData || session.user);
+          }
+        } else {
+          setUser(null);
+        }
       } catch (err) {
         if (!mounted) return;
         console.error('Auth init failed:', err);
@@ -55,11 +116,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth changes AFTER initial load
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, newSession) => {
         if (!mounted) return;
-        setSession(session);
-        setUser(session?.user ?? null);
-        // Don't set isLoading here - only affects state after initial load
+        setSession(newSession);
+
+        // Fetch user profile from users table
+        if (newSession?.user?.id) {
+          let userData = await fetchUserProfile(newSession.user.id);
+
+          // If no user record exists, create one
+          if (!userData && newSession.user) {
+            const { data: newUser, error: createError } = await supabase
+              .from('users')
+              .upsert({
+                id: newSession.user.id,
+                email: newSession.user.email,
+                full_name: newSession.user.user_metadata?.full_name || '',
+              }, { onConflict: 'id' })
+              .select()
+              .single();
+
+            if (!createError && newUser) {
+              userData = newUser;
+            } else if (createError) {
+              console.error('Error creating user record:', createError);
+            }
+          }
+
+          if (mounted) {
+            setUser(userData || newSession.user);
+          }
+        } else {
+          setUser(null);
+        }
       }
     );
 
@@ -72,7 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, fullName: string) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -82,6 +171,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       });
       if (error) throw error;
+
+      // Create user record in public.users table
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .upsert({
+            id: data.user.id,
+            email: data.user.email,
+            full_name: fullName,
+          }, { onConflict: 'id' });
+
+        if (profileError) {
+          console.error('Error creating user profile:', profileError);
+        }
+      }
     } finally {
       setIsLoading(false);
     }
@@ -191,6 +295,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         session,
         isLoading,
+        refreshUser,
         signUp,
         signIn,
         signInWithPhone,

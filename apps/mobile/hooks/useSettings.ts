@@ -67,7 +67,7 @@ export function useSettings() {
     try {
       // Get user's favorites
       const { data: favorites, error } = await supabase
-        .from('user_favorites')
+        .from('favorites')
         .select(`
           venue_id,
           venues (
@@ -180,6 +180,7 @@ export function useSettings() {
   const updateProfile = async (data: {
     full_name?: string;
     phone?: string;
+    avatar_url?: string;
   }): Promise<boolean> => {
     if (!user?.id) {
       showToast('Please sign in to update profile', 'error');

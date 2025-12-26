@@ -136,7 +136,7 @@ export default function ProfileScreen() {
               <View style={styles.avatarContainer}>
                 <Image
                   source={{
-                    uri: user.user_metadata?.avatar_url || 'https://via.placeholder.com/100',
+                    uri: user.avatar_url || 'https://via.placeholder.com/100',
                   }}
                   style={styles.avatar}
                 />
@@ -145,7 +145,7 @@ export default function ProfileScreen() {
                 </View>
               </View>
               <Text style={styles.userName}>
-                {user.user_metadata?.full_name || 'Buzzee User'}
+                {user.full_name || 'Buzzee User'}
               </Text>
               <Text style={styles.userEmail}>{user.email || user.phone}</Text>
               <TouchableOpacity

@@ -116,7 +116,7 @@ export default function FavoritesScreen() {
             </Text>
             <Button
               title="Explore Venues"
-              onPress={() => router.push('/(tabs)')}
+              onPress={() => router.push('/venues')}
               size="lg"
               style={styles.actionButton}
             />

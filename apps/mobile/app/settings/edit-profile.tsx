@@ -14,24 +14,82 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
+import { decode } from 'base64-arraybuffer';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSettings } from '@/hooks/useSettings';
+import { supabase } from '@/services/supabase';
 import { Button } from '@/components/ui';
 import { COLORS, SHADOWS } from '@/constants/colors';
 
 export default function EditProfileScreen() {
-  const { user, updateProfile } = useAuth();
+  const { user } = useAuth();
+  const { updateProfile } = useSettings();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [saving, setSaving] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   useEffect(() => {
     if (user) {
       setFullName(user.full_name || '');
       setEmail(user.email || '');
       setPhone((user as any).phone || '');
+      setAvatarUrl((user as any).avatar_url || null);
     }
   }, [user]);
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Please allow access to your photos to change your profile picture.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setAvatarUploading(true);
+      try {
+        const uri = result.assets[0].uri;
+        const filename = `avatar_${Date.now()}.jpg`;
+
+        // Read file as base64
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+
+        // Convert base64 to ArrayBuffer
+        const arrayBuffer = decode(base64);
+
+        // Upload ArrayBuffer directly
+        const { data, error } = await supabase.storage
+          .from('avatars')
+          .upload(`${user?.id}/${filename}`, arrayBuffer, {
+            contentType: 'image/jpeg',
+            upsert: true,
+          });
+
+        if (error) throw error;
+
+        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(data.path);
+        setAvatarUrl(urlData.publicUrl);
+      } catch (error) {
+        console.error('Avatar upload error:', error);
+        Alert.alert('Error', 'Failed to upload photo. Please try again.');
+      } finally {
+        setAvatarUploading(false);
+      }
+    }
+  };
 
   const handleSave = async () => {
     if (!fullName.trim()) {
@@ -41,12 +99,15 @@ export default function EditProfileScreen() {
 
     setSaving(true);
     try {
-      await updateProfile({
+      const success = await updateProfile({
         full_name: fullName.trim(),
         phone: phone.trim(),
+        avatar_url: avatarUrl || undefined,
       });
-      Alert.alert('Success', 'Profile updated successfully');
-      router.back();
+      if (success) {
+        Alert.alert('Success', 'Profile updated successfully');
+        router.back();
+      }
     } catch (error) {
       Alert.alert('Error', 'Failed to update profile');
     } finally {
@@ -73,19 +134,33 @@ export default function EditProfileScreen() {
         {/* Avatar Section */}
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
-            <LinearGradient
-              colors={['#1a1a2e', '#16213e']}
-              style={styles.avatarGradient}
+            {avatarUrl ? (
+              <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
+            ) : (
+              <LinearGradient
+                colors={['#1a1a2e', '#16213e']}
+                style={styles.avatarGradient}
+              >
+                <Text style={styles.avatarText}>
+                  {fullName ? fullName.charAt(0).toUpperCase() : '?'}
+                </Text>
+              </LinearGradient>
+            )}
+            <TouchableOpacity
+              style={styles.cameraButton}
+              onPress={pickImage}
+              disabled={avatarUploading}
             >
-              <Text style={styles.avatarText}>
-                {fullName ? fullName.charAt(0).toUpperCase() : '?'}
-              </Text>
-            </LinearGradient>
-            <TouchableOpacity style={styles.cameraButton}>
-              <Ionicons name="camera" size={16} color="#FFF" />
+              {avatarUploading ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <Ionicons name="camera" size={16} color="#FFF" />
+              )}
             </TouchableOpacity>
           </View>
-          <Text style={styles.avatarHint}>Tap to change photo</Text>
+          <Text style={styles.avatarHint}>
+            {avatarUploading ? 'Uploading...' : 'Tap to change photo'}
+          </Text>
         </View>
 
         {/* Form Fields */}
@@ -140,7 +215,7 @@ export default function EditProfileScreen() {
         <Button
           title={saving ? 'Saving...' : 'Save Changes'}
           onPress={handleSave}
-          disabled={saving}
+          disabled={saving || avatarUploading}
           size="lg"
           style={styles.saveButton}
         />
@@ -191,6 +266,11 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     position: 'relative',
+  },
+  avatarImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
   avatarGradient: {
     width: 100,
