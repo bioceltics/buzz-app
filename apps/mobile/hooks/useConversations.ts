@@ -39,14 +39,34 @@ export function useConversations() {
         .from('conversations')
         .select(`
           *,
-          venue:venues(id, name, logo_url)
+          venue:venues(id, name, logo_url),
+          messages(content, created_at, sender_type, read_at)
         `)
         .eq('user_id', user.id)
-        .order('last_message_at', { ascending: false });
+        .order('updated_at', { ascending: false });
 
       if (fetchError) throw fetchError;
 
-      setConversations(data || []);
+      // Process conversations to derive last_message and unread_count from messages
+      const processedConversations = (data || []).map((conv: any) => {
+        const messages = conv.messages || [];
+        const sortedMessages = [...messages].sort((a: any, b: any) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        const lastMessage = sortedMessages[0];
+        const unreadCount = messages.filter(
+          (m: any) => m.sender_type === 'venue' && !m.read_at
+        ).length;
+
+        return {
+          ...conv,
+          last_message: lastMessage?.content,
+          last_message_at: lastMessage?.created_at || conv.updated_at,
+          user_unread_count: unreadCount,
+        };
+      });
+
+      setConversations(processedConversations);
     } catch (err: any) {
       // Silently handle error for demo - just set empty conversations
       console.error('Error fetching conversations:', err);
@@ -121,10 +141,13 @@ export function useConversations() {
     if (!user) return;
 
     try {
+      // Mark all venue messages as read in the messages table
       await supabase
-        .from('conversations')
-        .update({ user_unread_count: 0 })
-        .eq('id', conversationId);
+        .from('messages')
+        .update({ read_at: new Date().toISOString() })
+        .eq('conversation_id', conversationId)
+        .eq('sender_type', 'venue')
+        .is('read_at', null);
 
       setConversations((prev) =>
         prev.map((c) =>

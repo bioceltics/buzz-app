@@ -1,18 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { StyleSheet, Platform, View } from 'react-native';
+import { StyleSheet, LogBox } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AnimatedSplashScreen from '@/components/splash/AnimatedSplashScreen';
 
-// Conditionally import gesture handler (not needed on web)
-let GestureHandlerRootView: any;
-if (Platform.OS !== 'web') {
-  GestureHandlerRootView = require('react-native-gesture-handler').GestureHandlerRootView;
-} else {
-  GestureHandlerRootView = View;
-}
+// Ignore known Expo SDK 52 DevLoadingView warning (development only)
+LogBox.ignoreLogs([
+  'View config getter callback for component `style`',
+]);
 
 // Create a query client
 const queryClient = new QueryClient({
@@ -24,29 +23,38 @@ const queryClient = new QueryClient({
   },
 });
 
-// Prevent splash screen from auto-hiding
-SplashScreen.preventAutoHideAsync();
+// Prevent native splash screen from auto-hiding
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
+  const [showSplash, setShowSplash] = useState(true);
   const [appReady, setAppReady] = useState(false);
 
   useEffect(() => {
-    async function prepare() {
+    // Immediately hide native splash to show our animated one
+    const prepare = async () => {
       try {
-        // Add any initialization logic here
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await SplashScreen.hideAsync();
       } catch (e) {
-        console.warn(e);
-      } finally {
-        setAppReady(true);
-        SplashScreen.hideAsync();
+        // Ignore errors
       }
-    }
+      // Mark app as ready after a small delay for resources to load
+      setTimeout(() => setAppReady(true), 100);
+    };
     prepare();
   }, []);
 
-  if (!appReady) {
-    return null;
+  const handleSplashComplete = useCallback(() => {
+    setShowSplash(false);
+  }, []);
+
+  if (showSplash) {
+    return (
+      <AnimatedSplashScreen
+        onAnimationComplete={handleSplashComplete}
+        isReady={appReady}
+      />
+    );
   }
 
   return (
@@ -59,6 +67,7 @@ export default function RootLayout() {
               contentStyle: { backgroundColor: '#fff' },
             }}
           >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
@@ -77,6 +86,13 @@ export default function RootLayout() {
                 headerTitle: '',
                 headerTransparent: true,
                 headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="scan"
+              options={{
+                headerShown: false,
+                presentation: 'fullScreenModal',
               }}
             />
           </Stack>

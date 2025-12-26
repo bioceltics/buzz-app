@@ -3,9 +3,6 @@ const path = require('path');
 
 const config = getDefaultConfig(__dirname);
 
-// Add web-specific extensions (web extensions take priority)
-config.resolver.sourceExts = ['web.tsx', 'web.ts', 'web.jsx', 'web.js', ...config.resolver.sourceExts];
-
 // Mock native-only modules on web
 const webMocks = {
   'react-native-maps': '__mocks__/react-native-maps.js',

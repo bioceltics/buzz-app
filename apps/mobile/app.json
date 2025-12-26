@@ -1,14 +1,14 @@
 {
   "expo": {
     "name": "Buzzee",
-    "slug": "buzzing",
+    "slug": "buzz",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "buzzing",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#E91E63"
     },
@@ -17,9 +17,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.buzzer.app",
+      "bundleIdentifier": "com.chantprojects.buzzee",
+      "buildNumber": "1",
       "config": {
-        "googleMapsApiKey": "YOUR_GOOGLE_MAPS_API_KEY"
+        "googleMapsApiKey": "AIzaSyASCQhKRvQfep1m1dDkgAwYHvGfbZHUn9U"
       },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Buzzee needs your location to show nearby deals and venues.",
@@ -31,12 +32,12 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#E91E63"
+        "backgroundColor": "#FFFFFF"
       },
-      "package": "com.buzzer.app",
+      "package": "com.chantprojects.buzzee",
       "config": {
         "googleMaps": {
-          "apiKey": "YOUR_GOOGLE_MAPS_API_KEY"
+          "apiKey": "AIzaSyASCQhKRvQfep1m1dDkgAwYHvGfbZHUn9U"
         }
       },
       "permissions": [
@@ -71,8 +72,10 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": false
     },
+    "newArchEnabled": false,
     "extra": {
       "eas": {
         "projectId": "92dc6f11-02d0-4f98-bfe1-8d7f9a8fa57e"
