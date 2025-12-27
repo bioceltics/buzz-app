@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, Platform } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { COLORS } from '@/constants/colors';
 
@@ -30,8 +31,9 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
           <StatusBar style="dark" />
           <Stack
             screenOptions={{
@@ -45,8 +47,9 @@ export default function RootLayout() {
             <Stack.Screen name="edit-deal" options={{ headerShown: false, presentation: 'modal' }} />
             <Stack.Screen name="create-event" options={{ headerShown: false, presentation: 'modal' }} />
           </Stack>
-        </GestureHandlerRootView>
-      </AuthProvider>
+          </GestureHandlerRootView>
+        </AuthProvider>
+      </SafeAreaProvider>
     </QueryClientProvider>
   );
 }

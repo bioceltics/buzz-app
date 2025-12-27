@@ -29,7 +29,8 @@
       },
       "package": "com.buzzee.venue",
       "permissions": [
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -44,10 +45,21 @@
           "cameraPermission": "Allow camera access to scan customer QR codes."
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "newArchEnabled": false,
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d0647af2-88c1-4e39-bb9a-bc8c3b7570dd"
+      }
+    },
+    "owner": "bioceltics"
   }
 }
