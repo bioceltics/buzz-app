@@ -8,6 +8,8 @@ import {
   RefreshControl,
   Dimensions,
   Platform,
+  Image,
+  ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,52 +19,188 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/services/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { BuzzeeIcon } from '@/components/ui/BuzzeeIcon';
-import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
+import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, GRADIENTS } from '@/constants/colors';
+import { useScreenRefresh } from '@/hooks';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const isWeb = Platform.OS === 'web';
+
+// TypeScript Interfaces
+interface Campaign {
+  id: string;
+  type: 'deal' | 'event';
+  title: string;
+  description?: string;
+  image_url: string | null;
+  is_active: boolean;
+  start_time: string;
+  end_time: string | null;
+  // Deal-specific
+  discount_type?: string;
+  discount_value?: number;
+  redemption_count?: number;
+  // Event-specific
+  event_type?: string;
+  rsvp_count?: number;
+}
+
+interface ActivityItem {
+  id: string;
+  type: 'redemption' | 'rsvp';
+  campaign_title: string;
+  campaign_type: 'deal' | 'event';
+  timestamp: string;
+}
+
+interface PerformanceSummary {
+  todayRedemptions: number;
+  totalActiveCampaigns: number;
+  weeklyChange: number;
+  weeklyTrend: 'up' | 'down' | 'stable';
+  topCampaign: { id: string; title: string; redemption_count: number } | null;
+}
+
+// Event type mappings
+const EVENT_TYPE_GRADIENTS: Record<string, [string, string]> = {
+  live_music: ['#8B5CF6', '#A78BFA'],
+  dj: ['#EC4899', '#F472B6'],
+  comedy: ['#F59E0B', '#FBBF24'],
+  trivia: ['#10B981', '#34D399'],
+  sports: ['#3B82F6', '#60A5FA'],
+  themed: ['#6366F1', '#818CF8'],
+  special: ['#EF4444', '#F87171'],
+  other: ['#6B7280', '#9CA3AF'],
+};
 
 export default function VenueDashboardScreen() {
   const { venue, refreshVenue } = useAuth();
-  const [refreshing, setRefreshing] = React.useState(false);
 
-  const { data: dealsStats, refetch: refetchStats } = useQuery({
-    queryKey: ['venue-deals-stats', venue?.id],
+  // Query 1: Active Campaigns (deals + events)
+  const { data: campaigns, refetch: refetchCampaigns } = useQuery({
+    queryKey: ['active-campaigns', venue?.id],
     queryFn: async () => {
-      if (!venue) return { total: 0, active: 0, redemptions: 0 };
-      const { data: deals } = await supabase
-        .from('deals')
-        .select('id, is_active, redemption_count')
-        .eq('venue_id', venue.id);
-      const total = deals?.length || 0;
-      const active = deals?.filter(d => d.is_active).length || 0;
-      const redemptions = deals?.reduce((sum, d) => sum + (d.redemption_count || 0), 0) || 0;
-      return { total, active, redemptions };
+      if (!venue) return [];
+      const now = new Date().toISOString();
+
+      const [dealsResult, eventsResult] = await Promise.all([
+        supabase
+          .from('deals')
+          .select('id, title, description, image_url, is_active, start_time, end_time, discount_type, discount_value, redemption_count')
+          .eq('venue_id', venue.id)
+          .eq('is_active', true)
+          .gte('end_time', now)
+          .order('created_at', { ascending: false })
+          .limit(10),
+        supabase
+          .from('events')
+          .select('id, title, description, image_url, is_active, start_time, end_time, type, rsvp_count')
+          .eq('venue_id', venue.id)
+          .eq('is_active', true)
+          .gte('start_time', now)
+          .order('start_time', { ascending: true })
+          .limit(10),
+      ]);
+
+      const allCampaigns: Campaign[] = [
+        ...(dealsResult.data || []).map(d => ({ ...d, type: 'deal' as const })),
+        ...(eventsResult.data || []).map(e => ({ ...e, type: 'event' as const, event_type: e.type })),
+      ].sort((a, b) => {
+        const aTime = a.type === 'deal' && a.end_time ? new Date(a.end_time).getTime() : new Date(a.start_time).getTime();
+        const bTime = b.type === 'deal' && b.end_time ? new Date(b.end_time).getTime() : new Date(b.start_time).getTime();
+        return aTime - bTime;
+      });
+
+      return allCampaigns;
     },
     enabled: !!venue,
+    refetchInterval: 30000,
   });
 
-  const { data: todayRedemptions, refetch: refetchToday } = useQuery({
-    queryKey: ['today-redemptions', venue?.id],
+  // Query 2: Recent Activity
+  const { data: recentActivity, refetch: refetchActivity } = useQuery({
+    queryKey: ['recent-activity', venue?.id],
     queryFn: async () => {
-      if (!venue) return 0;
+      if (!venue) return [];
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+      const { data: redemptions } = await supabase
+        .from('redemptions')
+        .select('id, redeemed_at, deal_id, deals(title)')
+        .eq('venue_id', venue.id)
+        .gte('redeemed_at', yesterday.toISOString())
+        .order('redeemed_at', { ascending: false })
+        .limit(15);
+
+      const activities: ActivityItem[] = (redemptions || []).map(r => ({
+        id: r.id,
+        type: 'redemption' as const,
+        campaign_title: (r.deals as any)?.title || 'Unknown Deal',
+        campaign_type: 'deal' as const,
+        timestamp: r.redeemed_at,
+      }));
+
+      return activities;
+    },
+    enabled: !!venue,
+    refetchInterval: 15000,
+  });
+
+  // Query 3: Performance Summary
+  const { data: performance, refetch: refetchPerformance } = useQuery({
+    queryKey: ['performance-summary', venue?.id],
+    queryFn: async () => {
+      if (!venue) return null;
+
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const { count } = await supabase
-        .from('redemptions')
-        .select('id', { count: 'exact', head: true })
-        .eq('venue_id', venue.id)
-        .gte('redeemed_at', today.toISOString());
-      return count || 0;
+
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+
+      const twoWeeksAgo = new Date();
+      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+      const now = new Date().toISOString();
+
+      const [todayResult, thisWeekResult, lastWeekResult, activeDealsResult, activeEventsResult, topDealResult] = await Promise.all([
+        supabase.from('redemptions').select('id', { count: 'exact', head: true })
+          .eq('venue_id', venue.id).gte('redeemed_at', today.toISOString()),
+        supabase.from('redemptions').select('id', { count: 'exact', head: true })
+          .eq('venue_id', venue.id).gte('redeemed_at', weekAgo.toISOString()),
+        supabase.from('redemptions').select('id', { count: 'exact', head: true })
+          .eq('venue_id', venue.id).gte('redeemed_at', twoWeeksAgo.toISOString()).lt('redeemed_at', weekAgo.toISOString()),
+        supabase.from('deals').select('id', { count: 'exact', head: true })
+          .eq('venue_id', venue.id).eq('is_active', true).gte('end_time', now),
+        supabase.from('events').select('id', { count: 'exact', head: true })
+          .eq('venue_id', venue.id).eq('is_active', true).gte('start_time', now),
+        supabase.from('deals').select('id, title, redemption_count')
+          .eq('venue_id', venue.id).eq('is_active', true).order('redemption_count', { ascending: false }).limit(1).single(),
+      ]);
+
+      const thisWeek = thisWeekResult.count || 0;
+      const lastWeek = lastWeekResult.count || 0;
+      const change = lastWeek > 0 ? Math.round(((thisWeek - lastWeek) / lastWeek) * 100) : 0;
+
+      return {
+        todayRedemptions: todayResult.count || 0,
+        totalActiveCampaigns: (activeDealsResult.count || 0) + (activeEventsResult.count || 0),
+        weeklyChange: Math.abs(change),
+        weeklyTrend: change > 5 ? 'up' : change < -5 ? 'down' : 'stable',
+        topCampaign: topDealResult.data,
+      } as PerformanceSummary;
     },
     enabled: !!venue,
   });
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await Promise.all([refreshVenue(), refetchStats(), refetchToday()]);
-    setRefreshing(false);
-  };
+  const { refreshing, handleRefresh } = useScreenRefresh({
+    onRefresh: async () => {
+      await Promise.all([
+        refreshVenue(),
+        refetchCampaigns(),
+        refetchActivity(),
+        refetchPerformance(),
+      ]);
+    },
+  });
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -71,36 +209,170 @@ export default function VenueDashboardScreen() {
     return 'Good evening';
   };
 
+  const getTimeRemaining = (endTime: string) => {
+    const end = new Date(endTime);
+    const now = new Date();
+    const diff = end.getTime() - now.getTime();
+    if (diff < 0) return 'Expired';
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    if (hours < 1) return `${Math.floor(diff / 60000)}m left`;
+    if (hours < 24) return `${hours}h left`;
+    return `${Math.floor(hours / 24)}d left`;
+  };
+
+  const getTimeAgo = (timestamp: string) => {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diff = now.getTime() - time.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return time.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  const getDealGradient = (discountType?: string): [string, string] => {
+    switch (discountType) {
+      case 'percentage': return [COLORS.primary, '#D81B60'];
+      case 'fixed': return ['#6366F1', '#8B5CF6'];
+      case 'bogo': return ['#059669', '#10B981'];
+      case 'free_item': return ['#D97706', '#F59E0B'];
+      default: return [COLORS.primary, '#D81B60'];
+    }
+  };
+
+  const getInsightText = () => {
+    if (!performance) return 'Loading insights...';
+    if (performance.weeklyTrend === 'up') {
+      return `Great week! Activity is up ${performance.weeklyChange}% from last week. Keep the momentum going!`;
+    } else if (performance.weeklyTrend === 'down') {
+      return `Activity is down ${performance.weeklyChange}% from last week. Try creating a flash deal to boost engagement.`;
+    }
+    return 'Your campaign performance is steady. Try experimenting with new deal types to grow.';
+  };
+
+  // Campaign Card Component
+  const CampaignCard = ({ campaign, index }: { campaign: Campaign; index: number }) => {
+    const isDeal = campaign.type === 'deal';
+    const gradient = isDeal
+      ? getDealGradient(campaign.discount_type)
+      : EVENT_TYPE_GRADIENTS[campaign.event_type || 'other'] || EVENT_TYPE_GRADIENTS.other;
+
+    return (
+      <TouchableOpacity
+        style={[styles.campaignCard, index === 0 && styles.campaignCardFirst]}
+        onPress={() => router.push(isDeal ? `/edit-deal?id=${campaign.id}` : `/edit-event?id=${campaign.id}`)}
+        activeOpacity={0.9}
+      >
+        {campaign.image_url ? (
+          <Image source={{ uri: campaign.image_url }} style={styles.campaignImage} />
+        ) : (
+          <LinearGradient colors={gradient} style={styles.campaignImagePlaceholder}>
+            <Ionicons
+              name={isDeal ? 'pricetag' : 'calendar'}
+              size={28}
+              color="rgba(255,255,255,0.4)"
+            />
+          </LinearGradient>
+        )}
+
+        <View style={[styles.typeBadge, isDeal ? styles.typeBadgeDeal : styles.typeBadgeEvent]}>
+          <Ionicons name={isDeal ? 'pricetag' : 'calendar'} size={10} color={isDeal ? COLORS.primary : '#6366F1'} />
+          <Text style={[styles.typeBadgeText, isDeal ? styles.typeBadgeTextDeal : styles.typeBadgeTextEvent]}>
+            {isDeal ? 'Deal' : 'Event'}
+          </Text>
+        </View>
+
+        <View style={styles.campaignContent}>
+          <Text style={styles.campaignTitle} numberOfLines={2}>{campaign.title}</Text>
+          <View style={styles.campaignMeta}>
+            <View style={styles.campaignMetaItem}>
+              <Ionicons name="time-outline" size={12} color={COLORS.textSecondary} />
+              <Text style={styles.campaignMetaText}>
+                {isDeal && campaign.end_time ? getTimeRemaining(campaign.end_time) : new Date(campaign.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </Text>
+            </View>
+            <View style={styles.campaignMetaItem}>
+              <Ionicons name={isDeal ? 'ticket-outline' : 'people-outline'} size={12} color={COLORS.textSecondary} />
+              <Text style={styles.campaignMetaText}>
+                {isDeal ? campaign.redemption_count || 0 : campaign.rsvp_count || 0}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  // Activity Item Component
+  const ActivityItemRow = ({ activity }: { activity: ActivityItem }) => {
+    const colors = { bg: '#D1FAE5', icon: '#059669' };
+    return (
+      <View style={styles.activityItem}>
+        <View style={[styles.activityIcon, { backgroundColor: colors.bg }]}>
+          <Ionicons name="checkmark-circle" size={16} color={colors.icon} />
+        </View>
+        <View style={styles.activityContent}>
+          <Text style={styles.activityAction}>Deal redeemed</Text>
+          <Text style={styles.activityCampaign} numberOfLines={1}>{activity.campaign_title}</Text>
+        </View>
+        <Text style={styles.activityTime}>{getTimeAgo(activity.timestamp)}</Text>
+      </View>
+    );
+  };
+
+  // Hero Background Component - Supports custom venue cover image
+  const HeroBackground = ({ children }: { children: React.ReactNode }) => {
+    if (venue?.cover_image_url) {
+      return (
+        <ImageBackground
+          source={{ uri: venue.cover_image_url }}
+          style={styles.heroSection}
+          resizeMode="cover"
+        >
+          <LinearGradient
+            colors={['rgba(26,26,46,0.65)', 'rgba(22,33,62,0.75)', 'rgba(15,52,96,0.85)']}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.decorativeCircle1} />
+          <View style={styles.decorativeCircle2} />
+          {children}
+        </ImageBackground>
+      );
+    }
+
+    return (
+      <LinearGradient
+        colors={['#1a1a2e', '#16213e', '#0f3460', '#1a1a2e']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.heroSection}
+      >
+        <View style={styles.decorativeCircle1} />
+        <View style={styles.decorativeCircle2} />
+        {children}
+      </LinearGradient>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#FFF" />
         }
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Hero Section with Premium Gradient */}
-        <LinearGradient
-          colors={['#1a1a2e', '#16213e', '#0f3460', '#1a1a2e']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.heroSection}
-        >
-          {/* Decorative Elements */}
-          <View style={styles.decorativeCircle1} />
-          <View style={styles.decorativeCircle2} />
+        {/* Hero Section with Customizable Background */}
+        <HeroBackground>
 
           <SafeAreaView edges={['top']}>
             {/* Header */}
             <View style={styles.header}>
               <View style={styles.headerLeft}>
-                <LinearGradient
-                  colors={[COLORS.primary, COLORS.primaryLight]}
-                  style={styles.logoContainer}
-                >
-                  <BuzzeeIcon size={18} color="#FFF" />
-                </LinearGradient>
+                <BuzzeeIcon size={32} showBackground />
                 <View>
                   <Text style={styles.logoText}>Buzzee</Text>
                   <Text style={styles.logoSubtext}>for Business</Text>
@@ -108,7 +380,7 @@ export default function VenueDashboardScreen() {
               </View>
               <TouchableOpacity
                 style={styles.profileButton}
-                onPress={() => router.push('/(tabs)/profile')}
+                onPress={() => router.push('/(tabs)/more')}
                 activeOpacity={0.8}
               >
                 <LinearGradient
@@ -126,7 +398,7 @@ export default function VenueDashboardScreen() {
               <Text style={styles.venueName}>{venue?.name || 'Your Business'}</Text>
             </View>
 
-            {/* Stats Cards - Glass Morphism Style */}
+            {/* Stats Cards - Updated for Campaigns */}
             <View style={styles.statsContainer}>
               <View style={styles.statsRow}>
                 <View style={styles.statCard}>
@@ -134,10 +406,10 @@ export default function VenueDashboardScreen() {
                     colors={['rgba(99,102,241,0.25)', 'rgba(99,102,241,0.08)']}
                     style={styles.statIconBg}
                   >
-                    <Ionicons name="flash" size={20} color="#818CF8" />
+                    <Ionicons name="megaphone" size={20} color="#818CF8" />
                   </LinearGradient>
-                  <Text style={styles.statValue}>{dealsStats?.active || 0}</Text>
-                  <Text style={styles.statLabel}>Active Deals</Text>
+                  <Text style={styles.statValue}>{campaigns?.length || 0}</Text>
+                  <Text style={styles.statLabel}>Active Campaigns</Text>
                 </View>
 
                 <View style={styles.statCard}>
@@ -145,202 +417,186 @@ export default function VenueDashboardScreen() {
                     colors={['rgba(52,211,153,0.25)', 'rgba(52,211,153,0.08)']}
                     style={styles.statIconBg}
                   >
-                    <Ionicons name="checkmark-done" size={20} color="#34D399" />
+                    <Ionicons name="pulse" size={20} color="#34D399" />
                   </LinearGradient>
-                  <Text style={styles.statValue}>{dealsStats?.redemptions || 0}</Text>
-                  <Text style={styles.statLabel}>Redeemed</Text>
+                  <Text style={styles.statValue}>{performance?.todayRedemptions || 0}</Text>
+                  <Text style={styles.statLabel}>Today</Text>
                 </View>
 
                 <View style={styles.statCard}>
                   <LinearGradient
-                    colors={['rgba(251,191,36,0.25)', 'rgba(251,191,36,0.08)']}
+                    colors={
+                      performance?.weeklyTrend === 'up'
+                        ? ['rgba(52,211,153,0.25)', 'rgba(52,211,153,0.08)']
+                        : ['rgba(251,191,36,0.25)', 'rgba(251,191,36,0.08)']
+                    }
                     style={styles.statIconBg}
                   >
-                    <Ionicons name="today" size={20} color="#FBBF24" />
+                    <Ionicons
+                      name={performance?.weeklyTrend === 'up' ? 'trending-up' : performance?.weeklyTrend === 'down' ? 'trending-down' : 'remove'}
+                      size={20}
+                      color={performance?.weeklyTrend === 'up' ? '#34D399' : '#FBBF24'}
+                    />
                   </LinearGradient>
-                  <Text style={styles.statValue}>{todayRedemptions || 0}</Text>
-                  <Text style={styles.statLabel}>Today</Text>
+                  <Text style={styles.statValue}>
+                    {performance?.weeklyTrend === 'up' ? '+' : performance?.weeklyTrend === 'down' ? '-' : ''}{performance?.weeklyChange || 0}%
+                  </Text>
+                  <Text style={styles.statLabel}>This Week</Text>
                 </View>
               </View>
             </View>
           </SafeAreaView>
-        </LinearGradient>
+        </HeroBackground>
 
         {/* Main Content */}
         <View style={styles.mainContent}>
-          {/* Quick Create Section */}
-          <View style={styles.sectionHeader}>
+          {/* Quick Create - Compact Version */}
+          <View style={styles.quickCreateSection}>
             <Text style={styles.sectionTitle}>Quick Create</Text>
-            <TouchableOpacity style={styles.seeAllButton}>
-              <Text style={styles.seeAllText}>See all</Text>
-              <Ionicons name="chevron-forward" size={16} color={COLORS.primary} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Two Primary Actions - Deal & Event */}
-          <View style={styles.createActions}>
-            {/* Create Deal */}
-            <TouchableOpacity
-              style={styles.createAction}
-              onPress={() => router.push('/create-deal')}
-              activeOpacity={0.9}
-            >
-              <LinearGradient
-                colors={[COLORS.primary, '#D81B60']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.createActionGradient}
+            <View style={styles.quickCreateRow}>
+              <TouchableOpacity
+                style={styles.quickCreateBtn}
+                onPress={() => router.push('/create-deal')}
+                activeOpacity={0.8}
               >
-                <View style={styles.createActionIconWrapper}>
-                  <View style={styles.createActionIcon}>
-                    <Ionicons name="pricetag" size={26} color="#FFF" />
-                  </View>
-                </View>
-                <Text style={styles.createActionTitle}>Daily Deal</Text>
-                <Text style={styles.createActionSubtitle}>Up to 24 hours</Text>
-                <View style={styles.createActionArrow}>
-                  <Ionicons name="arrow-forward" size={18} color="rgba(255,255,255,0.8)" />
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+                <LinearGradient colors={[COLORS.primary, '#D81B60']} style={styles.quickCreateBtnGradient}>
+                  <Ionicons name="pricetag" size={18} color="#FFF" />
+                  <Text style={styles.quickCreateBtnText}>New Deal</Text>
+                </LinearGradient>
+              </TouchableOpacity>
 
-            {/* Create Event */}
-            <TouchableOpacity
-              style={styles.createAction}
-              onPress={() => router.push('/create-event')}
-              activeOpacity={0.9}
-            >
-              <LinearGradient
-                colors={['#6366F1', '#8B5CF6']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.createActionGradient}
+              <TouchableOpacity
+                style={styles.quickCreateBtn}
+                onPress={() => router.push('/create-event')}
+                activeOpacity={0.8}
               >
-                <View style={styles.createActionIconWrapper}>
-                  <View style={styles.createActionIcon}>
-                    <Ionicons name="calendar" size={26} color="#FFF" />
-                  </View>
-                </View>
-                <Text style={styles.createActionTitle}>Event</Text>
-                <Text style={styles.createActionSubtitle}>Any duration</Text>
-                <View style={styles.createActionArrow}>
-                  <Ionicons name="arrow-forward" size={18} color="rgba(255,255,255,0.8)" />
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-
-          {/* Manage Section */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Manage</Text>
-          </View>
-
-          {/* Action Grid - Modern Cards */}
-          <View style={styles.actionGrid}>
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={() => router.push('/(tabs)/scanner')}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#ECFDF5', '#D1FAE5']}
-                style={styles.actionIconContainer}
-              >
-                <Ionicons name="qr-code" size={26} color="#059669" />
-              </LinearGradient>
-              <Text style={styles.actionTitle}>Scan</Text>
-              <Text style={styles.actionSubtitle}>QR Codes</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={() => router.push('/(tabs)/analytics')}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#FEF3C7', '#FDE68A']}
-                style={styles.actionIconContainer}
-              >
-                <Ionicons name="stats-chart" size={26} color="#D97706" />
-              </LinearGradient>
-              <Text style={styles.actionTitle}>Analytics</Text>
-              <Text style={styles.actionSubtitle}>Performance</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={() => router.push('/(tabs)/insights')}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#EDE9FE', '#DDD6FE']}
-                style={styles.actionIconContainer}
-              >
-                <Ionicons name="sparkles" size={26} color="#7C3AED" />
-              </LinearGradient>
-              <Text style={styles.actionTitle}>AI Insights</Text>
-              <Text style={styles.actionSubtitle}>Smart Tips</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={() => router.push('/(tabs)/profile')}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#FCE7F3', '#FBCFE8']}
-                style={styles.actionIconContainer}
-              >
-                <Ionicons name="settings" size={26} color="#DB2777" />
-              </LinearGradient>
-              <Text style={styles.actionTitle}>Settings</Text>
-              <Text style={styles.actionSubtitle}>Profile</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Insight Card - Premium Design */}
-          <View style={styles.insightCard}>
-            <LinearGradient
-              colors={['rgba(5, 150, 105, 0.08)', 'rgba(5, 150, 105, 0.02)']}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={styles.insightHeader}>
-              <View style={styles.insightIconContainer}>
-                <Ionicons name="trending-up" size={22} color="#059669" />
-              </View>
-              <View style={styles.insightBadge}>
-                <Ionicons name="bulb" size={12} color="#059669" />
-                <Text style={styles.insightBadgeText}>Tip</Text>
-              </View>
+                <LinearGradient colors={['#6366F1', '#8B5CF6']} style={styles.quickCreateBtnGradient}>
+                  <Ionicons name="calendar" size={18} color="#FFF" />
+                  <Text style={styles.quickCreateBtnText}>New Event</Text>
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
-            <Text style={styles.insightTitle}>Performance Insight</Text>
-            <Text style={styles.insightText}>
-              Businesses that post deals weekly see 40% more customer engagement. Keep your deals fresh!
-            </Text>
-            <TouchableOpacity style={styles.insightButton} onPress={() => router.push('/create-deal')}>
-              <Text style={styles.insightButtonText}>Create a Deal</Text>
-              <Ionicons name="arrow-forward" size={16} color="#059669" />
-            </TouchableOpacity>
           </View>
 
-          {/* Bottom Stats - Glass Style */}
-          <View style={styles.bottomStats}>
-            <View style={styles.bottomStatItem}>
-              <View style={styles.bottomStatIcon}>
-                <Ionicons name="layers-outline" size={18} color={COLORS.primary} />
-              </View>
-              <Text style={styles.bottomStatValue}>{dealsStats?.total || 0}</Text>
-              <Text style={styles.bottomStatLabel}>Total Deals</Text>
+          {/* Active Campaigns Carousel */}
+          <View style={styles.campaignsSection}>
+            <View style={[styles.sectionHeader, { paddingHorizontal: 20 }]}>
+              <Text style={styles.sectionTitle}>Active Campaigns</Text>
+              {campaigns && campaigns.length > 0 && (
+                <TouchableOpacity style={styles.seeAllBtn} onPress={() => router.push('/(tabs)/deals')}>
+                  <Text style={styles.seeAllText}>See All</Text>
+                  <Ionicons name="chevron-forward" size={16} color={COLORS.primary} />
+                </TouchableOpacity>
+              )}
             </View>
-            <View style={styles.bottomStatDivider} />
-            <View style={styles.bottomStatItem}>
-              <View style={styles.bottomStatIcon}>
-                <Ionicons name="trending-up-outline" size={18} color={COLORS.success} />
+
+            {!campaigns || campaigns.length === 0 ? (
+              <View style={styles.emptyCarousel}>
+                <LinearGradient colors={[COLORS.primaryLighter, '#FDF2F8']} style={styles.emptyCarouselIcon}>
+                  <Ionicons name="megaphone-outline" size={32} color={COLORS.primary} />
+                </LinearGradient>
+                <Text style={styles.emptyCarouselTitle}>No Active Campaigns</Text>
+                <Text style={styles.emptyCarouselSubtitle}>Create a deal or event to get started</Text>
               </View>
-              <Text style={styles.bottomStatValue}>
-                {dealsStats?.redemptions ? Math.round((dealsStats.redemptions / Math.max(dealsStats.total, 1)) * 10) / 10 : 0}
-              </Text>
-              <Text style={styles.bottomStatLabel}>Avg. Redemptions</Text>
+            ) : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.campaignsCarousel}
+              >
+                {campaigns.map((campaign, index) => (
+                  <CampaignCard key={campaign.id} campaign={campaign} index={index} />
+                ))}
+              </ScrollView>
+            )}
+          </View>
+
+          {/* Recent Activity Feed */}
+          <View style={styles.activitySection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Recent Activity</Text>
+              {recentActivity && recentActivity.length > 0 && (
+                <View style={styles.liveBadge}>
+                  <View style={styles.liveDot} />
+                  <Text style={styles.liveText}>Live</Text>
+                </View>
+              )}
+            </View>
+
+            {!recentActivity || recentActivity.length === 0 ? (
+              <View style={styles.emptyActivity}>
+                <Ionicons name="pulse-outline" size={40} color={COLORS.textTertiary} />
+                <Text style={styles.emptyActivityText}>No recent activity</Text>
+                <Text style={styles.emptyActivitySubtext}>Activity will appear here as customers engage</Text>
+              </View>
+            ) : (
+              <View style={styles.activityList}>
+                {recentActivity.slice(0, 5).map((activity, index) => (
+                  <View
+                    key={activity.id}
+                    style={[styles.activityItemWrapper, index === Math.min(recentActivity.length, 5) - 1 && styles.activityItemLast]}
+                  >
+                    <ActivityItemRow activity={activity} />
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+
+          {/* Performance Summary Card */}
+          <View style={styles.performanceSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Performance</Text>
+              <TouchableOpacity style={styles.insightsBtn} onPress={() => router.push('/(tabs)/deals')}>
+                <Ionicons name="sparkles" size={14} color={COLORS.primary} />
+                <Text style={styles.insightsBtnText}>Full Report</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.performanceCard}>
+              <LinearGradient
+                colors={['rgba(99, 102, 241, 0.08)', 'rgba(99, 102, 241, 0.02)']}
+                style={StyleSheet.absoluteFill}
+              />
+
+              <View style={styles.performanceStats}>
+                <View style={styles.performanceStat}>
+                  <LinearGradient colors={GRADIENTS.success} style={styles.performanceStatIcon}>
+                    <Ionicons name="checkmark-done" size={16} color="#FFF" />
+                  </LinearGradient>
+                  <Text style={styles.performanceStatValue}>{performance?.todayRedemptions || 0}</Text>
+                  <Text style={styles.performanceStatLabel}>Redeemed Today</Text>
+                </View>
+
+                <View style={styles.performanceStatDivider} />
+
+                <View style={styles.performanceStat}>
+                  <LinearGradient colors={GRADIENTS.secondary} style={styles.performanceStatIcon}>
+                    <Ionicons name="megaphone" size={16} color="#FFF" />
+                  </LinearGradient>
+                  <Text style={styles.performanceStatValue}>{performance?.totalActiveCampaigns || 0}</Text>
+                  <Text style={styles.performanceStatLabel}>Active Campaigns</Text>
+                </View>
+              </View>
+
+              <View style={styles.insightBox}>
+                <View style={styles.insightHeader}>
+                  <LinearGradient colors={['#6366F1', '#8B5CF6']} style={styles.insightIcon}>
+                    <Ionicons name="bulb" size={14} color="#FFF" />
+                  </LinearGradient>
+                  <Text style={styles.insightLabel}>AI Insight</Text>
+                </View>
+                <Text style={styles.insightText}>{getInsightText()}</Text>
+
+                {performance?.topCampaign && (
+                  <View style={styles.topCampaignBadge}>
+                    <Ionicons name="trophy" size={12} color="#D97706" />
+                    <Text style={styles.topCampaignText}>
+                      Top: {performance.topCampaign.title} ({performance.topCampaign.redemption_count} redeemed)
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
           </View>
 
@@ -397,13 +653,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-  },
-  logoContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   logoText: {
     fontSize: 20,
@@ -463,7 +712,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
-    backdropFilter: 'blur(10px)',
   },
   statIconBg: {
     width: 44,
@@ -484,25 +732,54 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.55)',
     fontWeight: '600',
     letterSpacing: 0.2,
+    textAlign: 'center',
   },
   mainContent: {
-    padding: 20,
+    paddingTop: 20,
     marginTop: -8,
   },
+  // Quick Create Compact
+  quickCreateSection: {
+    paddingHorizontal: 20,
+    marginBottom: 8,
+  },
+  quickCreateRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 12,
+  },
+  quickCreateBtn: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+    ...SHADOWS.md,
+  },
+  quickCreateBtnGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+  },
+  quickCreateBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  // Section Header
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
-    marginTop: 8,
+    marginBottom: 14,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: '#111827',
-    letterSpacing: -0.4,
+    letterSpacing: -0.3,
   },
-  seeAllButton: {
+  seeAllBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
@@ -512,192 +789,300 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontWeight: '600',
   },
-  createActions: {
+  // Campaigns Carousel
+  campaignsSection: {
+    marginTop: 20,
+  },
+  campaignsCarousel: {
+    paddingLeft: 20,
+    paddingRight: 8,
+  },
+  campaignCard: {
+    width: 180,
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginRight: 12,
+    ...SHADOWS.md,
+  },
+  campaignCardFirst: {},
+  campaignImage: {
+    width: '100%',
+    height: 100,
+  },
+  campaignImagePlaceholder: {
+    width: '100%',
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  typeBadge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  typeBadgeDeal: {
+    backgroundColor: COLORS.primaryLighter,
+  },
+  typeBadgeEvent: {
+    backgroundColor: '#EDE9FE',
+  },
+  typeBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  typeBadgeTextDeal: {
+    color: COLORS.primary,
+  },
+  typeBadgeTextEvent: {
+    color: '#6366F1',
+  },
+  campaignContent: {
+    padding: 12,
+  },
+  campaignTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: 8,
+    lineHeight: 18,
+  },
+  campaignMeta: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 8,
   },
-  createAction: {
-    flex: 1,
-    borderRadius: 24,
-    overflow: 'hidden',
-    ...SHADOWS.lg,
-  },
-  createActionGradient: {
-    padding: 20,
-    paddingBottom: 24,
-    minHeight: 160,
-    position: 'relative',
-  },
-  createActionIconWrapper: {
-    marginBottom: 20,
-  },
-  createActionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+  campaignMetaItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    gap: 4,
   },
-  createActionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFF',
-    marginBottom: 4,
-  },
-  createActionSubtitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+  campaignMetaText: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
     fontWeight: '500',
   },
-  createActionArrow: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+  emptyCarousel: {
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  actionItem: {
-    width: (SCREEN_WIDTH - 52) / 2,
-    backgroundColor: '#FFF',
+    paddingVertical: 32,
+    paddingHorizontal: 40,
+    marginHorizontal: 20,
+    backgroundColor: COLORS.white,
     borderRadius: 20,
-    padding: 18,
     ...SHADOWS.sm,
   },
-  actionIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    alignItems: 'center',
+  emptyCarouselIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
     justifyContent: 'center',
-    marginBottom: 14,
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  actionTitle: {
+  emptyCarouselTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
-    marginBottom: 3,
+    color: COLORS.text,
+    marginBottom: 4,
   },
-  actionSubtitle: {
+  emptyCarouselSubtitle: {
     fontSize: 13,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  // Activity Feed
+  activitySection: {
+    paddingHorizontal: 20,
+    marginTop: 24,
+  },
+  liveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#FEE2E2',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#EF4444',
+  },
+  liveText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#DC2626',
+  },
+  activityList: {
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    padding: 4,
+    ...SHADOWS.sm,
+  },
+  activityItemWrapper: {
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
+  },
+  activityItemLast: {
+    borderBottomWidth: 0,
+  },
+  activityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+  },
+  activityIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  activityContent: {
+    flex: 1,
+  },
+  activityAction: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  activityCampaign: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  activityTime: {
+    fontSize: 11,
+    color: COLORS.textTertiary,
     fontWeight: '500',
   },
-  insightCard: {
+  emptyActivity: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    ...SHADOWS.sm,
+  },
+  emptyActivityText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginTop: 12,
+  },
+  emptyActivitySubtext: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+  },
+  // Performance Summary
+  performanceSection: {
+    paddingHorizontal: 20,
+    marginTop: 24,
+  },
+  insightsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  insightsBtnText: {
+    fontSize: 14,
+    color: COLORS.primary,
+    fontWeight: '600',
+  },
+  performanceCard: {
+    backgroundColor: COLORS.white,
     borderRadius: 24,
     padding: 20,
-    marginTop: 20,
-    borderWidth: 1.5,
-    borderColor: '#A7F3D0',
-    backgroundColor: '#FFF',
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.15)',
+    ...SHADOWS.md,
+  },
+  performanceStats: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+  performanceStat: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  performanceStatIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  performanceStatValue: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  performanceStatLabel: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+    fontWeight: '500',
+  },
+  performanceStatDivider: {
+    width: 1,
+    backgroundColor: COLORS.borderLight,
+    marginHorizontal: 16,
+  },
+  insightBox: {
+    backgroundColor: 'rgba(99, 102, 241, 0.06)',
+    borderRadius: 16,
+    padding: 16,
   },
   insightHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 14,
-  },
-  insightIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: '#D1FAE5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  insightBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
-  insightBadgeText: {
-    fontSize: 12,
-    color: '#059669',
-    fontWeight: '600',
-  },
-  insightTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#065F46',
+    gap: 8,
     marginBottom: 8,
+  },
+  insightIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  insightLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6366F1',
   },
   insightText: {
     fontSize: 14,
-    color: '#047857',
-    lineHeight: 21,
-    marginBottom: 16,
+    color: COLORS.text,
+    lineHeight: 20,
   },
-  insightButton: {
+  topCampaignBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginTop: 12,
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
     alignSelf: 'flex-start',
-    backgroundColor: '#D1FAE5',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
   },
-  insightButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#059669',
-  },
-  bottomStats: {
-    flexDirection: 'row',
-    backgroundColor: '#FFF',
-    borderRadius: 24,
-    padding: 20,
-    marginTop: 20,
-    ...SHADOWS.sm,
-  },
-  bottomStatItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  bottomStatIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  bottomStatValue: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  bottomStatLabel: {
+  topCampaignText: {
     fontSize: 12,
-    color: '#6B7280',
-    textAlign: 'center',
+    color: '#D97706',
     fontWeight: '500',
   },
-  bottomStatDivider: {
-    width: 1,
-    backgroundColor: '#E5E7EB',
-    marginHorizontal: 16,
-  },
   bottomPadding: {
-    height: 100,
+    height: 120,
   },
 });

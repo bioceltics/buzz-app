@@ -343,7 +343,7 @@ export default function ScannerScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <Ionicons name="camera-off" size={64} color={COLORS.textTertiary} />
+          <Ionicons name="videocam-off" size={64} color={COLORS.textTertiary} />
           <Text style={styles.errorTitle}>Camera Access Required</Text>
           <Text style={styles.errorSubtitle}>
             Please enable camera access in settings to scan QR codes

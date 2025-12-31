@@ -14,6 +14,7 @@ export default function SettingsLayout() {
       <Stack.Screen name="media" />
       <Stack.Screen name="notifications" />
       <Stack.Screen name="billing" />
+      <Stack.Screen name="support" />
     </Stack>
   );
 }

@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, Platform } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { COLORS } from '@/constants/colors';
+import AnimatedSplashScreen from '@/components/splash/AnimatedSplashScreen';
 
 // Use View instead of GestureHandlerRootView on web
 let GestureHandlerRootView: any;
@@ -28,7 +30,40 @@ const queryClient = new QueryClient({
   },
 });
 
+// Prevent native splash screen from auto-hiding
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
 export default function RootLayout() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [appReady, setAppReady] = useState(false);
+
+  useEffect(() => {
+    // Immediately hide native splash to show our animated one
+    const prepare = async () => {
+      try {
+        await SplashScreen.hideAsync();
+      } catch (e) {
+        // Ignore errors
+      }
+      // Mark app as ready after a small delay for resources to load
+      setTimeout(() => setAppReady(true), 100);
+    };
+    prepare();
+  }, []);
+
+  const handleSplashComplete = useCallback(() => {
+    setShowSplash(false);
+  }, []);
+
+  if (showSplash) {
+    return (
+      <AnimatedSplashScreen
+        onAnimationComplete={handleSplashComplete}
+        isReady={appReady}
+      />
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>

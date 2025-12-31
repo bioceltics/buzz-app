@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,8 +15,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/services/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { COLORS, SHADOWS } from '@/constants/colors';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+import { HeaderWithAction, EmptyState } from '@/components/ui';
+import { useScreenRefresh } from '@/hooks';
 
 interface Event {
   id: string;
@@ -71,7 +70,6 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 
 export default function EventsScreen() {
   const { venue } = useAuth();
-  const [refreshing, setRefreshing] = useState(false);
 
   const { data: events, refetch, isLoading } = useQuery({
     queryKey: ['venue-events', venue?.id],
@@ -88,11 +86,9 @@ export default function EventsScreen() {
     enabled: !!venue,
   });
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await refetch();
-    setRefreshing(false);
-  };
+  const { refreshing, handleRefresh } = useScreenRefresh({
+    onRefresh: async () => { await refetch(); },
+  });
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -117,63 +113,38 @@ export default function EventsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Events</Text>
-          <Text style={styles.headerSubtitle}>
-            {events?.length || 0} events • {upcomingEvents.length} upcoming
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push('/create-event')}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={['#6366F1', '#8B5CF6']}
-            style={styles.addButtonGradient}
-          >
-            <Ionicons name="add" size={26} color="#FFF" />
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+      <HeaderWithAction
+        title="Events"
+        subtitle={`${events?.length || 0} events • ${upcomingEvents.length} upcoming`}
+        rightAction={{
+          icon: 'add',
+          onPress: () => router.push('/create-event'),
+          gradient: ['#6366F1', '#8B5CF6'],
+        }}
+      />
 
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
         {/* Empty State */}
         {(!events || events.length === 0) && !isLoading && (
-          <View style={styles.emptyState}>
-            <LinearGradient
-              colors={['#EDE9FE', '#DDD6FE']}
-              style={styles.emptyIconContainer}
-            >
-              <Ionicons name="calendar-outline" size={48} color="#6366F1" />
-            </LinearGradient>
-            <Text style={styles.emptyTitle}>No Events Yet</Text>
-            <Text style={styles.emptyText}>
-              Create your first event to attract more customers to your venue
-            </Text>
-            <TouchableOpacity
-              style={styles.createButton}
-              onPress={() => router.push('/create-event')}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#6366F1', '#8B5CF6']}
-                style={styles.createButtonGradient}
-              >
-                <Ionicons name="add" size={22} color="#FFF" />
-                <Text style={styles.createButtonText}>Create Event</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
+          <EmptyState
+            icon="calendar-outline"
+            iconGradient={['#EDE9FE', '#DDD6FE']}
+            title="No Events Yet"
+            subtitle="Create your first event to attract more customers to your venue"
+            ctaButton={{
+              label: 'Create Event',
+              icon: 'add',
+              onPress: () => router.push('/create-event'),
+              gradient: ['#6366F1', '#8B5CF6'],
+            }}
+          />
         )}
 
         {/* Upcoming Events */}
@@ -211,7 +182,7 @@ export default function EventsScreen() {
                       style={styles.eventTypeIcon}
                     >
                       <Ionicons
-                        name={EVENT_TYPE_ICONS[event.event_type] || 'calendar'}
+                        name={EVENT_TYPE_ICONS[event.event_type] as any || 'calendar'}
                         size={18}
                         color="#FFF"
                       />
@@ -284,7 +255,7 @@ export default function EventsScreen() {
                 </View>
                 <View style={styles.pastEventIcon}>
                   <Ionicons
-                    name={EVENT_TYPE_ICONS[event.event_type] || 'calendar'}
+                    name={EVENT_TYPE_ICONS[event.event_type] as any || 'calendar'}
                     size={18}
                     color={COLORS.textTertiary}
                   />
@@ -305,89 +276,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8FAFC',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#FFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#111827',
-    letterSpacing: -0.5,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-    fontWeight: '500',
-  },
-  addButton: {
-    borderRadius: 26,
-    overflow: 'hidden',
-    ...SHADOWS.primary,
-  },
-  addButtonGradient: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   content: {
     flex: 1,
   },
   scrollContent: {
     paddingTop: 8,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 80,
-    paddingHorizontal: 32,
-  },
-  emptyIconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  emptyTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: 28,
-    lineHeight: 22,
-  },
-  createButton: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    ...SHADOWS.primary,
-  },
-  createButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 28,
-    paddingVertical: 16,
-  },
-  createButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '600',
   },
   section: {
     paddingHorizontal: 16,

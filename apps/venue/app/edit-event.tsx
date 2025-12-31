@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,18 +6,19 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Platform,
   Alert,
+  Platform,
   ActivityIndicator,
   Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/services/supabase';
-import { useAuth } from '@/contexts/AuthContext';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
+import { useConfirmDialog } from '@/hooks';
 import { GradientButton } from '@/components/ui';
 
 const EVENT_TYPES = [
@@ -38,9 +39,10 @@ const AGE_RESTRICTIONS = [
   { id: '21+', label: '21+' },
 ];
 
-export default function CreateEventScreen() {
-  const { venue } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+export default function EditEventScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const queryClient = useQueryClient();
+  const { showDeleteDialog } = useConfirmDialog();
 
   // Form state
   const [title, setTitle] = useState('');
@@ -55,59 +57,130 @@ export default function CreateEventScreen() {
   const [ageRestriction, setAgeRestriction] = useState('none');
   const [capacity, setCapacity] = useState('');
   const [dressCode, setDressCode] = useState('');
+  const [isActive, setIsActive] = useState(true);
 
-  const handleSubmit = async () => {
-    if (!title.trim()) {
-      Alert.alert('Error', 'Please enter an event title');
-      return;
-    }
-    if (!eventType) {
-      Alert.alert('Error', 'Please select an event type');
-      return;
-    }
-    if (!startDate || !startTime) {
-      Alert.alert('Error', 'Please set the event start date and time');
-      return;
-    }
+  // Fetch event
+  const { data: event, isLoading } = useQuery({
+    queryKey: ['event', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('id', id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
 
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.from('events').insert({
-        venue_id: venue?.id,
-        title: title.trim(),
-        description: description.trim(),
-        event_type: eventType,
-        start_date: startDate,
-        end_date: endDate || startDate,
-        start_time: startTime,
-        end_time: endTime || null,
-        is_free: isFree,
-        cover_charge: isFree ? 0 : parseFloat(coverCharge) || 0,
-        age_restriction: ageRestriction,
-        capacity: capacity ? parseInt(capacity) : null,
-        dress_code: dressCode.trim() || null,
-        is_active: true,
-      });
+  // Populate form with existing data
+  useEffect(() => {
+    if (event) {
+      setTitle(event.title || '');
+      setDescription(event.description || '');
+      setEventType(event.event_type || '');
+      setStartDate(event.start_date || '');
+      setEndDate(event.end_date || '');
+      setStartTime(event.start_time || '');
+      setEndTime(event.end_time || '');
+      setIsFree(event.is_free ?? true);
+      setCoverCharge(event.cover_charge?.toString() || '');
+      setAgeRestriction(event.age_restriction || 'none');
+      setCapacity(event.capacity?.toString() || '');
+      setDressCode(event.dress_code || '');
+      setIsActive(event.is_active ?? true);
+    }
+  }, [event]);
+
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      if (!title.trim()) throw new Error('Title is required');
+      if (!eventType) throw new Error('Event type is required');
+      if (!startDate || !startTime) throw new Error('Start date and time are required');
+
+      const { error } = await supabase
+        .from('events')
+        .update({
+          title: title.trim(),
+          description: description.trim(),
+          event_type: eventType,
+          start_date: startDate,
+          end_date: endDate || startDate,
+          start_time: startTime,
+          end_time: endTime || null,
+          is_free: isFree,
+          cover_charge: isFree ? 0 : parseFloat(coverCharge) || 0,
+          age_restriction: ageRestriction,
+          capacity: capacity ? parseInt(capacity) : null,
+          dress_code: dressCode.trim() || null,
+          is_active: isActive,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
 
       if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['venue-events'] });
+      queryClient.invalidateQueries({ queryKey: ['event', id] });
 
       if (Platform.OS === 'web') {
-        window.alert('Event created successfully!');
+        window.alert('Event updated successfully!');
       } else {
-        Alert.alert('Success', 'Event created successfully!');
+        Alert.alert('Success', 'Event updated successfully!');
       }
       router.back();
-    } catch (error: any) {
-      const message = error.message || 'Failed to create event';
+    },
+    onError: (error: Error) => {
       if (Platform.OS === 'web') {
-        window.alert(`Error: ${message}`);
+        window.alert(`Error: ${error.message}`);
       } else {
-        Alert.alert('Error', message);
+        Alert.alert('Error', error.message);
       }
-    } finally {
-      setIsLoading(false);
-    }
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['venue-events'] });
+
+      if (Platform.OS === 'web') {
+        window.alert('Event deleted successfully!');
+      } else {
+        Alert.alert('Success', 'Event deleted successfully!');
+      }
+      router.back();
+    },
+    onError: (error: Error) => {
+      if (Platform.OS === 'web') {
+        window.alert(`Error: ${error.message}`);
+      } else {
+        Alert.alert('Error', error.message);
+      }
+    },
+  });
+
+  const handleDelete = () => {
+    showDeleteDialog(title, () => deleteMutation.mutate());
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -116,11 +189,42 @@ export default function CreateEventScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Create Event</Text>
-        <View style={{ width: 40 }} />
+        <Text style={styles.headerTitle}>Edit Event</Text>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={handleDelete}
+          disabled={deleteMutation.isPending}
+        >
+          <Ionicons name="trash-outline" size={22} color={COLORS.error} />
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Active Toggle */}
+        <TouchableOpacity
+          style={[styles.toggleCard, isActive ? styles.toggleActive : styles.toggleInactive]}
+          onPress={() => setIsActive(!isActive)}
+        >
+          <View style={styles.toggleContent}>
+            <Ionicons
+              name={isActive ? 'checkmark-circle' : 'pause-circle'}
+              size={24}
+              color={isActive ? COLORS.success : COLORS.textSecondary}
+            />
+            <View>
+              <Text style={styles.toggleTitle}>
+                {isActive ? 'Event is Active' : 'Event is Hidden'}
+              </Text>
+              <Text style={styles.toggleSubtitle}>
+                {isActive ? 'Visible to customers' : 'Hidden from customers'}
+              </Text>
+            </View>
+          </View>
+          <View style={[styles.toggle, isActive && styles.toggleOn]}>
+            <View style={[styles.toggleThumb, isActive && styles.toggleThumbOn]} />
+          </View>
+        </TouchableOpacity>
+
         {/* Event Details */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Event Details</Text>
@@ -320,12 +424,12 @@ export default function CreateEventScreen() {
         {/* Submit Button */}
         <View style={styles.submitSection}>
           <GradientButton
-            label="Create Event"
-            onPress={handleSubmit}
+            label="Save Changes"
+            onPress={() => updateMutation.mutate()}
             icon="checkmark"
             iconPosition="right"
-            loading={isLoading}
-            disabled={isLoading}
+            loading={updateMutation.isPending}
+            disabled={updateMutation.isPending}
             fullWidth
             size="lg"
           />
@@ -341,6 +445,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -363,8 +472,62 @@ const styles = StyleSheet.create({
     fontWeight: TYPOGRAPHY.weights.bold,
     color: COLORS.text,
   },
+  deleteButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   content: {
     flex: 1,
+  },
+  toggleCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    margin: SPACING.md,
+    padding: SPACING.base,
+    borderRadius: RADIUS.lg,
+  },
+  toggleActive: {
+    backgroundColor: '#D1FAE5',
+  },
+  toggleInactive: {
+    backgroundColor: COLORS.backgroundSecondary,
+  },
+  toggleContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+    flex: 1,
+  },
+  toggleTitle: {
+    fontSize: TYPOGRAPHY.sizes.base,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    color: COLORS.text,
+  },
+  toggleSubtitle: {
+    fontSize: TYPOGRAPHY.sizes.sm,
+    color: COLORS.textSecondary,
+  },
+  toggle: {
+    width: 50,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: COLORS.textTertiary,
+    padding: 2,
+  },
+  toggleOn: {
+    backgroundColor: COLORS.success,
+  },
+  toggleThumb: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: COLORS.white,
+  },
+  toggleThumbOn: {
+    marginLeft: 'auto',
   },
   section: {
     backgroundColor: COLORS.white,

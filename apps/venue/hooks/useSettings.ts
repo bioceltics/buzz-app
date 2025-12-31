@@ -40,15 +40,10 @@ const showToast = (message: string, type: 'success' | 'error' = 'success') => {
 };
 
 export function useSettings() {
-  const { venue, user, refreshVenue, isDemoMode } = useAuth();
+  const { venue, user, refreshVenue } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const updateVenueProfile = async (data: Partial<VenueProfile>): Promise<boolean> => {
-    if (isDemoMode) {
-      showToast('Profile updated! (Demo mode)');
-      return true;
-    }
-
     if (!venue?.id) {
       showToast('No venue found', 'error');
       return false;
@@ -79,11 +74,6 @@ export function useSettings() {
   };
 
   const updateOperatingHours = async (hours: OperatingHours): Promise<boolean> => {
-    if (isDemoMode) {
-      showToast('Hours updated! (Demo mode)');
-      return true;
-    }
-
     if (!venue?.id) {
       showToast('No venue found', 'error');
       return false;
@@ -114,11 +104,6 @@ export function useSettings() {
   };
 
   const updateNotificationPreferences = async (prefs: NotificationPreferences): Promise<boolean> => {
-    if (isDemoMode) {
-      showToast('Preferences updated! (Demo mode)');
-      return true;
-    }
-
     if (!user?.id) {
       showToast('No user found', 'error');
       return false;
@@ -150,11 +135,6 @@ export function useSettings() {
     uri: string,
     type: 'logo' | 'cover' | 'gallery'
   ): Promise<string | null> => {
-    if (isDemoMode) {
-      showToast('Image uploaded! (Demo mode)');
-      return 'https://placeholder.com/image.jpg';
-    }
-
     if (!venue?.id) {
       showToast('No venue found', 'error');
       return null;
@@ -217,11 +197,6 @@ export function useSettings() {
   };
 
   const removeGalleryImage = async (imageUrl: string): Promise<boolean> => {
-    if (isDemoMode) {
-      showToast('Image removed! (Demo mode)');
-      return true;
-    }
-
     if (!venue?.id) {
       showToast('No venue found', 'error');
       return false;
@@ -255,7 +230,6 @@ export function useSettings() {
     venue,
     user,
     isLoading,
-    isDemoMode,
     updateVenueProfile,
     updateOperatingHours,
     updateNotificationPreferences,

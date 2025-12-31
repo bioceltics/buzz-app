@@ -16,6 +16,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/services/supabase';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS } from '@/constants/colors';
+import { GradientButton } from '@/components/ui';
 
 const DISCOUNT_TYPES = [
   { id: 'percentage', label: 'Percentage Off', icon: 'pricetag' },
@@ -275,20 +276,15 @@ export default function EditDealScreen() {
         )}
 
         {/* Update Button */}
-        <TouchableOpacity
-          style={[styles.updateButton, updateMutation.isPending && styles.updateButtonDisabled]}
+        <GradientButton
+          label="Save Changes"
           onPress={() => updateMutation.mutate()}
+          icon="checkmark-circle"
+          loading={updateMutation.isPending}
           disabled={updateMutation.isPending}
-        >
-          {updateMutation.isPending ? (
-            <ActivityIndicator color={COLORS.white} />
-          ) : (
-            <>
-              <Ionicons name="checkmark-circle" size={20} color={COLORS.white} />
-              <Text style={styles.updateButtonText}>Save Changes</Text>
-            </>
-          )}
-        </TouchableOpacity>
+          fullWidth
+          size="lg"
+        />
 
         <View style={{ height: SPACING['2xl'] }} />
       </ScrollView>

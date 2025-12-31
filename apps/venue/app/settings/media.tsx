@@ -75,12 +75,7 @@ export default function MediaScreen() {
                 {venue?.logo_url ? (
                   <Image source={{ uri: venue.logo_url }} style={styles.logoImage} />
                 ) : (
-                  <LinearGradient
-                    colors={[COLORS.primary, '#D81B60']}
-                    style={styles.logoPlaceholder}
-                  >
-                    <BuzzeeIcon size={32} color="#FFF" />
-                  </LinearGradient>
+                  <BuzzeeIcon size={40} showBackground />
                 )}
               </View>
               <View style={styles.mediaInfo}>

@@ -29,7 +29,7 @@ interface PlanTier {
 const PLAN_TIERS: PlanTier[] = [
   {
     name: 'Starter',
-    price: '$99',
+    price: '$49.99',
     period: '/month',
     description: 'Perfect for small venues testing the platform',
     features: [
@@ -42,7 +42,7 @@ const PLAN_TIERS: PlanTier[] = [
   },
   {
     name: 'Pro',
-    price: '$199',
+    price: '$99.99',
     period: '/month',
     description: 'For active venues maximizing customer traffic',
     features: [
@@ -74,7 +74,7 @@ const PLAN_TIERS: PlanTier[] = [
 ];
 
 export default function BillingScreen() {
-  const { venue, isDemoMode } = useSettings();
+  const { venue } = useSettings();
   const currentPlan = (venue as any)?.subscription_tier || 'starter';
 
   const getCurrentPlanName = () => {
@@ -110,12 +110,6 @@ export default function BillingScreen() {
               <Ionicons name="diamond" size={16} color="#FFF" />
               <Text style={styles.currentPlanBadgeText}>Current Plan</Text>
             </View>
-            {isDemoMode && (
-              <View style={styles.demoBadge}>
-                <Ionicons name="flask" size={12} color="#FFF" />
-                <Text style={styles.demoBadgeText}>Demo</Text>
-              </View>
-            )}
           </View>
           <Text style={styles.currentPlanName}>{getCurrentPlanName()}</Text>
           <Text style={styles.currentPlanDescription}>
@@ -307,20 +301,6 @@ const styles = StyleSheet.create({
   },
   currentPlanBadgeText: {
     fontSize: 13,
-    color: '#FFF',
-    fontWeight: '600',
-  },
-  demoBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#6366F1',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  demoBadgeText: {
-    fontSize: 11,
     color: '#FFF',
     fontWeight: '600',
   },

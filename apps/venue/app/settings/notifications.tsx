@@ -70,7 +70,7 @@ const NOTIFICATION_OPTIONS: NotificationOption[] = [
 ];
 
 export default function NotificationsScreen() {
-  const { user, isLoading, updateNotificationPreferences, isDemoMode } = useSettings();
+  const { user, isLoading, updateNotificationPreferences } = useSettings();
   const [preferences, setPreferences] = useState<NotificationPreferences>(DEFAULT_PREFERENCES);
   const [saving, setSaving] = useState(false);
 
@@ -154,16 +154,6 @@ export default function NotificationsScreen() {
             </View>
           ))}
         </View>
-
-        {/* Demo Mode Notice */}
-        {isDemoMode && (
-          <View style={styles.demoNotice}>
-            <Ionicons name="flask" size={18} color="#6366F1" />
-            <Text style={styles.demoNoticeText}>
-              Demo mode: Changes are simulated
-            </Text>
-          </View>
-        )}
 
         {/* Helper Text */}
         <View style={styles.helperCard}>
@@ -280,22 +270,6 @@ const styles = StyleSheet.create({
   optionDescription: {
     fontSize: 13,
     color: COLORS.textSecondary,
-  },
-  demoNotice: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 20,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#EDE9FE',
-    borderRadius: 12,
-  },
-  demoNoticeText: {
-    fontSize: 14,
-    color: '#6366F1',
-    fontWeight: '600',
   },
   helperCard: {
     flexDirection: 'row',

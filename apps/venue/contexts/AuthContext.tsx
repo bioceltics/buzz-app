@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/services/supabase';
 
@@ -18,6 +19,7 @@ interface Venue {
   type: string;
   address: string | null;
   logo_url: string | null;
+  cover_image_url: string | null;
 }
 
 interface AuthContextType {
@@ -25,31 +27,14 @@ interface AuthContextType {
   session: Session | null;
   venue: Venue | null;
   isLoading: boolean;
-  isDemoMode: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, venueName: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshVenue: () => Promise<void>;
-  enterDemoMode: () => void;
+  signInWithGoogle: () => Promise<void>;
+  signInWithFacebook: () => Promise<void>;
+  signInWithApple: () => Promise<void>;
 }
-
-// Demo data for preview mode
-const DEMO_USER = {
-  id: 'demo-user-id',
-  email: 'demo@buzzee.com',
-  app_metadata: {},
-  user_metadata: { role: 'venue_owner' },
-  aud: 'authenticated',
-  created_at: new Date().toISOString(),
-} as User;
-
-const DEMO_VENUE: Venue = {
-  id: 'demo-venue-id',
-  name: 'Demo Lounge & Bar',
-  type: 'bar',
-  address: '123 Demo Street, San Francisco, CA',
-  logo_url: null,
-};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -58,21 +43,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [venue, setVenue] = useState<Venue | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
-
-  const enterDemoMode = () => {
-    console.log('Entering demo mode');
-    setUser(DEMO_USER);
-    setVenue(DEMO_VENUE);
-    setIsDemoMode(true);
-    setIsLoading(false);
-  };
 
   const fetchVenue = async (userId: string) => {
     try {
       const { data } = await supabase
         .from('venues')
-        .select('id, name, type, address, logo_url')
+        .select('id, name, type, address, logo_url, cover_image_url')
         .eq('owner_id', userId)
         .maybeSingle();
       setVenue(data);
@@ -154,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, venueName: string) => {
+  const signUp = async (email: string, password: string, venueName: string, venueType: string = 'bar') => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -171,16 +147,85 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!data.user) {
       throw new Error('Failed to create account. Please try again.');
     }
+
+    // CREATE VENUE RECORD after successful signup
+    const slug = venueName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      + '-' + Date.now().toString(36);
+
+    const { error: venueError } = await supabase
+      .from('venues')
+      .insert({
+        owner_id: data.user.id,
+        name: venueName,
+        slug: slug,
+        type: venueType as any,
+        address: 'TBD',
+        city: 'TBD',
+        province: 'TBD',
+        postal_code: 'TBD',
+        location: `POINT(0 0)`,
+      });
+
+    if (venueError) {
+      console.error('Error creating venue:', venueError);
+    } else {
+      // Fetch the newly created venue to populate context
+      await fetchVenue(data.user.id);
+    }
   };
 
   const signOut = async () => {
-    if (isDemoMode) {
-      setUser(null);
-      setVenue(null);
-      setIsDemoMode(false);
-      return;
+    // Clear local state FIRST, before calling Supabase
+    // This ensures user is signed out locally even if server call fails
+    setUser(null);
+    setVenue(null);
+    setSession(null);
+
+    // Then try to sign out from Supabase (don't throw on error)
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Supabase signOut error:', error);
+      // Don't throw - user is already signed out locally
     }
-    const { error } = await supabase.auth.signOut();
+  };
+
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: Platform.OS === 'web'
+          ? window.location.origin
+          : 'buzzee-venue://auth/callback',
+      },
+    });
+    if (error) throw error;
+  };
+
+  const signInWithFacebook = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: {
+        redirectTo: Platform.OS === 'web'
+          ? window.location.origin
+          : 'buzzee-venue://auth/callback',
+      },
+    });
+    if (error) throw error;
+  };
+
+  const signInWithApple = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: {
+        redirectTo: Platform.OS === 'web'
+          ? window.location.origin
+          : 'buzzee-venue://auth/callback',
+      },
+    });
     if (error) throw error;
   };
 
@@ -197,12 +242,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         venue,
         isLoading,
-        isDemoMode,
         signIn,
         signUp,
         signOut,
         refreshVenue,
-        enterDemoMode,
+        signInWithGoogle,
+        signInWithFacebook,
+        signInWithApple,
       }}
     >
       {children}

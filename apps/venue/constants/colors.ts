@@ -110,6 +110,43 @@ export const COLORS = {
   cafe: '#FF9100',
   cafeLight: '#FFF3E0',
 
+  // Status Colors (for deals, events)
+  statusActive: '#10B981',
+  statusPaused: '#F59E0B',
+  statusExpired: '#EF4444',
+  statusPending: '#6366F1',
+  statusUpcoming: '#3B82F6',
+  statusPast: '#6B7280',
+
+  // Icon Accent Colors
+  iconIndigo: '#818CF8',
+  iconGreen: '#34D399',
+  iconAmber: '#FBBF24',
+  iconEmerald: '#059669',
+  iconOrange: '#D97706',
+  iconPurple: '#7C3AED',
+  iconPink: '#DB2777',
+  iconBlue: '#3B82F6',
+  iconRed: '#EF4444',
+
+  // Insight/Analytics Colors
+  insightLow: '#60A5FA',
+  insightMedium: '#34D399',
+  insightBusy: '#FBBF24',
+  insightPeak: '#F87171',
+
+  // Background Variants
+  bgSlate: '#F8FAFC',
+  bgGray50: '#F9FAFB',
+  bgGray100: '#F3F4F6',
+  bgGray200: '#E5E7EB',
+
+  // Text Variants
+  textGray900: '#111827',
+  textGray700: '#374151',
+  textGray500: '#6B7280',
+  textGray400: '#9CA3AF',
+
   // Glassmorphism - Futuristic
   glass: 'rgba(255, 255, 255, 0.8)',
   glassDark: 'rgba(26, 26, 46, 0.85)',
@@ -440,6 +477,38 @@ export const GRADIENTS = {
   neonPurple: ['#E91E63', '#7C3AED'] as const,
   neonCyan: ['#00BCD4', '#00E5FF'] as const,
   cyberpunk: ['#E91E63', '#00BCD4'] as const,
+
+  // Event Type Gradients
+  eventLiveMusic: ['#8B5CF6', '#A78BFA'] as const,
+  eventDJ: ['#EC4899', '#F472B6'] as const,
+  eventComedy: ['#F59E0B', '#FBBF24'] as const,
+  eventTrivia: ['#10B981', '#34D399'] as const,
+  eventSports: ['#3B82F6', '#60A5FA'] as const,
+  eventThemed: ['#6366F1', '#818CF8'] as const,
+  eventSpecial: ['#EF4444', '#F87171'] as const,
+  eventOther: ['#6B7280', '#9CA3AF'] as const,
+
+  // Action Card Gradients
+  actionScan: ['#ECFDF5', '#D1FAE5'] as const,
+  actionAnalytics: ['#FEF3C7', '#FDE68A'] as const,
+  actionAI: ['#EDE9FE', '#DDD6FE'] as const,
+  actionSettings: ['#FCE7F3', '#FBCFE8'] as const,
+
+  // Discount Type Gradients
+  discountPercentage: ['#E91E63', '#D81B60'] as const,
+  discountFixed: ['#6366F1', '#8B5CF6'] as const,
+  discountBogo: ['#059669', '#10B981'] as const,
+  discountFreeItem: ['#D97706', '#F59E0B'] as const,
+  discountInactive: ['#6B7280', '#9CA3AF'] as const,
+
+  // Rank Gradients (for leaderboards)
+  rankGold: ['#FFD700', '#FFA500'] as const,
+  rankSilver: ['#C0C0C0', '#A0A0A0'] as const,
+  rankBronze: ['#CD7F32', '#B87333'] as const,
+  rankDefault: ['#E5E7EB', '#D1D5DB'] as const,
+
+  // Hero/Dark gradients
+  heroDark: ['#1a1a2e', '#16213e', '#0f3460', '#1a1a2e'] as const,
 } as const;
 
 // Blur values

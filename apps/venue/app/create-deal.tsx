@@ -8,16 +8,15 @@ import {
   TextInput,
   Alert,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/services/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS } from '@/constants/colors';
+import { GradientButton } from '@/components/ui';
 
 const DISCOUNT_TYPES = [
   { id: 'percentage', label: '% Off', icon: 'pricetag' },
@@ -300,27 +299,16 @@ export default function CreateDealScreen() {
         </View>
 
         {/* Create Button */}
-        <TouchableOpacity
-          style={styles.createButton}
+        <GradientButton
+          label="Launch Deal"
           onPress={() => createMutation.mutate()}
+          icon="flash"
+          loading={createMutation.isPending}
           disabled={createMutation.isPending}
-        >
-          <LinearGradient
-            colors={createMutation.isPending ? ['#9CA3AF', '#9CA3AF'] : [COLORS.primary, '#E91E63']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.createButtonGradient}
-          >
-            {createMutation.isPending ? (
-              <ActivityIndicator color="#FFF" />
-            ) : (
-              <>
-                <Ionicons name="flash" size={22} color="#FFF" />
-                <Text style={styles.createButtonText}>Launch Deal</Text>
-              </>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
+          fullWidth
+          size="lg"
+          style={{ marginTop: SPACING.md }}
+        />
 
         <View style={{ height: 40 }} />
       </ScrollView>
