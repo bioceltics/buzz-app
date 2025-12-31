@@ -10,7 +10,6 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,17 +19,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { BuzzeeIcon } from '@/components/ui/BuzzeeIcon';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 
-const { width } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
 const maxFormWidth = 440;
 
 export default function LoginScreen() {
-  const { signIn, signInWithGoogle, signInWithFacebook, signInWithApple } = useAuth();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | 'facebook' | null>(null);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
@@ -46,26 +43,6 @@ export default function LoginScreen() {
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSocialLogin = async (provider: 'google' | 'apple' | 'facebook') => {
-    setSocialLoading(provider);
-    try {
-      if (provider === 'google') {
-        await signInWithGoogle();
-      } else if (provider === 'apple') {
-        await signInWithApple();
-      } else {
-        await signInWithFacebook();
-      }
-    } catch (error: any) {
-      if (Platform.OS === 'web') {
-        window.alert(`Login Failed\n\n${error.message}`);
-      } else {
-        Alert.alert('Login Failed', error.message);
-      }
-      setSocialLoading(null);
-    }
   };
 
   const handleLogin = async () => {
@@ -240,55 +217,6 @@ export default function LoginScreen() {
                   <Text style={styles.signUpLink}>Create account</Text>
                 </TouchableOpacity>
               </View>
-
-              {/* Social Auth Divider */}
-              <View style={styles.dividerContainer}>
-                <View style={styles.divider} />
-                <Text style={styles.dividerText}>or continue with</Text>
-                <View style={styles.divider} />
-              </View>
-
-              {/* Social Login Buttons */}
-              <View style={styles.socialButtons}>
-                <TouchableOpacity
-                  style={[styles.socialButton, socialLoading === 'google' && styles.socialButtonDisabled]}
-                  onPress={() => handleSocialLogin('google')}
-                  activeOpacity={0.7}
-                  disabled={socialLoading !== null}
-                >
-                  {socialLoading === 'google' ? (
-                    <ActivityIndicator color="#DB4437" size="small" />
-                  ) : (
-                    <Ionicons name="logo-google" size={24} color="#DB4437" />
-                  )}
-                </TouchableOpacity>
-                {Platform.OS === 'ios' && (
-                  <TouchableOpacity
-                    style={[styles.socialButton, socialLoading === 'apple' && styles.socialButtonDisabled]}
-                    onPress={() => handleSocialLogin('apple')}
-                    activeOpacity={0.7}
-                    disabled={socialLoading !== null}
-                  >
-                    {socialLoading === 'apple' ? (
-                      <ActivityIndicator color={COLORS.text} size="small" />
-                    ) : (
-                      <Ionicons name="logo-apple" size={24} color={COLORS.text} />
-                    )}
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity
-                  style={[styles.socialButton, socialLoading === 'facebook' && styles.socialButtonDisabled]}
-                  onPress={() => handleSocialLogin('facebook')}
-                  activeOpacity={0.7}
-                  disabled={socialLoading !== null}
-                >
-                  {socialLoading === 'facebook' ? (
-                    <ActivityIndicator color="#4267B2" size="small" />
-                  ) : (
-                    <Ionicons name="logo-facebook" size={24} color="#4267B2" />
-                  )}
-                </TouchableOpacity>
-              </View>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -455,40 +383,5 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.sizes.base,
     color: COLORS.primary,
     fontWeight: TYPOGRAPHY.weights.bold,
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: SPACING.xl,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.borderLight,
-  },
-  dividerText: {
-    marginHorizontal: SPACING.base,
-    color: COLORS.textTertiary,
-    fontSize: TYPOGRAPHY.sizes.sm,
-    fontWeight: TYPOGRAPHY.weights.medium,
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: SPACING.base,
-  },
-  socialButton: {
-    width: 60,
-    height: 60,
-    borderRadius: RADIUS.xl,
-    borderWidth: 1.5,
-    borderColor: COLORS.borderLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    ...SHADOWS.sm,
-  },
-  socialButtonDisabled: {
-    opacity: 0.7,
   },
 });

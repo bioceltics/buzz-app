@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Platform } from 'react-native';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/services/supabase';
 
@@ -31,9 +30,6 @@ interface AuthContextType {
   signUp: (email: string, password: string, venueName: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshVenue: () => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
-  signInWithFacebook: () => Promise<void>;
-  signInWithApple: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -193,42 +189,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: Platform.OS === 'web'
-          ? window.location.origin
-          : 'buzzee-venue://auth/callback',
-      },
-    });
-    if (error) throw error;
-  };
-
-  const signInWithFacebook = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'facebook',
-      options: {
-        redirectTo: Platform.OS === 'web'
-          ? window.location.origin
-          : 'buzzee-venue://auth/callback',
-      },
-    });
-    if (error) throw error;
-  };
-
-  const signInWithApple = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-      options: {
-        redirectTo: Platform.OS === 'web'
-          ? window.location.origin
-          : 'buzzee-venue://auth/callback',
-      },
-    });
-    if (error) throw error;
-  };
-
   const refreshVenue = async () => {
     if (user) {
       await fetchVenue(user.id);
@@ -246,9 +206,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signOut,
         refreshVenue,
-        signInWithGoogle,
-        signInWithFacebook,
-        signInWithApple,
       }}
     >
       {children}
