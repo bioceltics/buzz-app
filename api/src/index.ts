@@ -16,14 +16,22 @@ import chatRoutes from './routes/chat.js';
 import adminRoutes from './routes/admin.js';
 import aiRoutes from './routes/ai.js';
 import billingRoutes from './routes/billing.js';
+import blogRoutes from './routes/blog.js';
+import { blogScheduler } from './services/blogScheduler.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Security middleware
 app.use(helmet());
+
+// Parse CORS origins from env
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+  : '*';
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: corsOrigins,
   credentials: true,
 }));
 
@@ -56,6 +64,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/blog', blogRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -68,9 +77,17 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Buzz API running on port ${PORT}`);
-});
+// Start server (only in non-serverless mode)
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Buzz API running on port ${PORT}`);
+
+    // Start the blog scheduler (only works in persistent server mode)
+    if (process.env.BLOG_SCHEDULER_ENABLED === 'true') {
+      blogScheduler.start();
+      console.log('📝 Blog scheduler initialized');
+    }
+  });
+}
 
 export default app;
