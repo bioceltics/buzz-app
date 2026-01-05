@@ -141,6 +141,8 @@ function getCategoryColor(category: string): { bg: string; text: string; border:
     'business-tips': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
     'happy-hour': { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200' },
     'city-guides': { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200' },
+    'company-news': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
+    'founder-spotlight': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
   };
   return colors[category] || { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' };
 }

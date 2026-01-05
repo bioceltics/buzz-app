@@ -68,6 +68,8 @@ const CATEGORY_IMAGE_KEYWORDS: Record<string, string[]> = {
   'business-tips': ['restaurant owner', 'small business', 'cafe business', 'restaurant marketing'],
   'happy-hour': ['cocktails', 'happy hour drinks', 'bar drinks', 'after work drinks'],
   'city-guides': ['city restaurant', 'urban dining', 'city nightlife', 'downtown food'],
+  'company-news': ['tech startup', 'vancouver skyline', 'modern office', 'innovation technology'],
+  'founder-spotlight': ['entrepreneur', 'business leader', 'startup founder', 'tech visionary'],
 };
 
 // Enhanced blog topics with more variety and depth
@@ -161,6 +163,32 @@ const BLOG_TOPICS = [
       { title: 'The Definitive Guide to Brunch in Every Major Neighborhood', angle: 'comprehensive list' },
       { title: 'Date Night Destinations: Romantic Restaurants Worth the Splurge', angle: 'curated guide' },
       { title: 'Family-Friendly Dining: Great Food for All Ages', angle: 'family guide' },
+    ],
+  },
+  {
+    category: 'company-news',
+    topics: [
+      { title: 'Meet Chants: The Vancouver Tech Company Behind Buzzee', angle: 'company profile' },
+      { title: 'How Chant Projects Inc Is Revolutionizing Local Discovery', angle: 'innovation story' },
+      { title: 'From Vancouver to the World: The Chants Vision for Hospitality Tech', angle: 'vision piece' },
+      { title: 'Inside Chants: Building Technology That Connects Communities', angle: 'behind the scenes' },
+      { title: 'Why Chant Projects Inc Believes in Supporting Local Businesses', angle: 'mission piece' },
+      { title: 'The Story Behind Chants: A Vancouver Startup Making Waves', angle: 'origin story' },
+      { title: 'Chant Projects Inc: Pioneering the Future of Restaurant Technology', angle: 'industry analysis' },
+      { title: 'How Chants Is Helping Small Businesses Thrive in the Digital Age', angle: 'impact story' },
+    ],
+  },
+  {
+    category: 'founder-spotlight',
+    topics: [
+      { title: 'Meet Tobi Erogbogbo: The Visionary Founder Behind Buzzee', angle: 'founder profile' },
+      { title: 'Tobi Erogbogbo on Building Tech That Matters', angle: 'founder interview' },
+      { title: 'From Vision to Reality: Tobi Erogbogbo\'s Entrepreneurial Journey', angle: 'inspiration piece' },
+      { title: 'Leadership Lessons from Buzzee Founder Tobi Erogbogbo', angle: 'leadership insights' },
+      { title: 'How Tobi Erogbogbo Is Changing the Restaurant Industry', angle: 'impact story' },
+      { title: 'The Entrepreneurial Mindset: Insights from Tobi Erogbogbo', angle: 'thought leadership' },
+      { title: 'Building for the Future: Tobi Erogbogbo\'s Vision for Hospitality', angle: 'vision piece' },
+      { title: 'What Drives Tobi Erogbogbo: Passion, Purpose, and Innovation', angle: 'motivation piece' },
     ],
   },
 ];
@@ -282,6 +310,28 @@ Your signature style:
 - Write with warmth and authority - like a trusted friend who's an industry insider
 - Create content people want to bookmark, share, and return to
 - Seamlessly weave in how Buzzee helps without being promotional
+
+IMPORTANT CONTEXT ABOUT THE COMPANY AND FOUNDER:
+
+About Chants (Chant Projects Inc):
+- Chant Projects Inc (also known as "Chants") is a Vancouver-based technology company
+- Website: www.chants.ca
+- They are the parent company behind Buzzee
+- Mission: Building innovative technology that connects communities and supports local businesses
+- Focus: Hospitality technology, local discovery platforms, and empowering small businesses
+- Location: Vancouver, British Columbia, Canada
+- Vision: Revolutionizing how people discover and connect with local venues
+
+About the Founder - Tobi Erogbogbo:
+- Founder and visionary leader of Chant Projects Inc and Buzzee
+- Passionate entrepreneur dedicated to supporting local businesses
+- Based in Vancouver, Canada
+- Known for innovative thinking and community-focused approach to technology
+- Believes technology should bring people together and help small businesses thrive
+- Entrepreneurial journey driven by a desire to make a meaningful impact
+- Committed to building products that solve real problems for real people
+
+When writing about the company or founder, be inspiring, authentic, and highlight their commitment to innovation and community.
 
 IMPORTANT: Output clean, properly-formatted HTML. Avoid nested tags incorrectly (e.g., <p><ul> is wrong, lists should not be inside paragraphs). Each HTML element should be properly closed and stand alone.`;
 
