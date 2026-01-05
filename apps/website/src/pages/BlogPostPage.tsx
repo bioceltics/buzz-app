@@ -281,75 +281,6 @@ function FloatingActionBar({ title, url }: { title: string; url: string }) {
   );
 }
 
-// Table of Contents
-function TableOfContents({ content }: { content: string }) {
-  const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
-  const [activeId, setActiveId] = useState<string>('');
-
-  useEffect(() => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(content, 'text/html');
-    const h2s = doc.querySelectorAll('h2');
-
-    const items = Array.from(h2s).map((h, index) => ({
-      id: `heading-${index}`,
-      text: h.textContent || '',
-      level: 2,
-    }));
-
-    setHeadings(items);
-  }, [content]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '-100px 0px -80% 0px' }
-    );
-
-    headings.forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
-
-    return () => observer.disconnect();
-  }, [headings]);
-
-  if (headings.length < 2) return null;
-
-  return (
-    <div className="hidden xl:block">
-      <div className="sticky top-28">
-        <div className="p-5 bg-gray-50 rounded-xl border border-gray-100">
-          <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">
-            On this page
-          </h4>
-          <nav className="space-y-1.5">
-            {headings.map(({ id, text }) => (
-              <a
-                key={id}
-                href={`#${id}`}
-                className={`block text-sm py-1 transition-colors line-clamp-2 ${
-                  activeId === id
-                    ? 'text-primary-600 font-medium'
-                    : 'text-gray-500 hover:text-gray-900'
-                }`}
-              >
-                {text}
-              </a>
-            ))}
-          </nav>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // Related Posts Component
 function RelatedPosts({ currentSlug }: { currentSlug: string }) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -558,147 +489,138 @@ export default function BlogPostPage() {
       <FloatingActionBar title={post.title} url={currentUrl} />
 
       <article className="pt-28 pb-16">
-        {/* Article Header */}
-        <header className="max-w-3xl mx-auto px-4 mb-10">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-            <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
-            <ChevronLeft className="w-3.5 h-3.5 rotate-180" />
-            <Link to="/blog" className="hover:text-gray-900 transition-colors">Blog</Link>
-            <ChevronLeft className="w-3.5 h-3.5 rotate-180" />
-            <Link to={`/blog?category=${post.category}`} className="hover:text-gray-900 transition-colors capitalize">
-              {post.category.replace(/-/g, ' ')}
+        <div className="max-w-3xl mx-auto px-4">
+          {/* Article Header */}
+          <header className="mb-8">
+            {/* Breadcrumb */}
+            <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+              <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
+              <ChevronLeft className="w-3.5 h-3.5 rotate-180" />
+              <Link to="/blog" className="hover:text-gray-900 transition-colors">Blog</Link>
+              <ChevronLeft className="w-3.5 h-3.5 rotate-180" />
+              <Link to={`/blog?category=${post.category}`} className="hover:text-gray-900 transition-colors capitalize">
+                {post.category.replace(/-/g, ' ')}
+              </Link>
+            </nav>
+
+            {/* Category Badge */}
+            <Link
+              to={`/blog?category=${post.category}`}
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border mb-4 hover:scale-105 transition-transform ${categoryColor.bg} ${categoryColor.text} ${categoryColor.border}`}
+            >
+              {post.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
             </Link>
-          </nav>
 
-          {/* Category Badge */}
-          <Link
-            to={`/blog?category=${post.category}`}
-            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border mb-4 hover:scale-105 transition-transform ${categoryColor.bg} ${categoryColor.text} ${categoryColor.border}`}
-          >
-            {post.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-          </Link>
+            {/* Title */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-5 leading-tight">
+              {post.title}
+            </h1>
 
-          {/* Title */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-5 leading-tight">
-            {post.title}
-          </h1>
+            {/* Excerpt */}
+            <p className="text-lg text-gray-600 leading-relaxed mb-6">
+              {post.excerpt}
+            </p>
 
-          {/* Excerpt */}
-          <p className="text-lg text-gray-600 leading-relaxed mb-6">
-            {post.excerpt}
-          </p>
+            {/* Meta Info */}
+            <div className="flex flex-wrap items-center gap-4 pb-6 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 via-primary-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold">
+                  {post.author.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900 text-sm">{post.author}</p>
+                  <p className="text-xs text-gray-500">Content Team</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-gray-500">
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4" />
+                  {formatDate(post.published_at)}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4" />
+                  {estimateReadTime(post.content)} min read
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Eye className="w-4 h-4" />
+                  {post.view_count.toLocaleString()} views
+                </span>
+              </div>
+            </div>
+          </header>
 
-          {/* Meta Info */}
-          <div className="flex flex-wrap items-center gap-4 pb-6 border-b border-gray-100">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 via-primary-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold">
+          {/* Featured Image */}
+          {post.featured_image && (
+            <div className="mb-10">
+              <div className="aspect-[2/1] rounded-2xl overflow-hidden bg-gray-100 shadow-lg">
+                <img
+                  src={post.featured_image}
+                  alt={post.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Share Buttons */}
+          <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-100">
+            <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">Share this article</span>
+            <ShareButtons title={post.title} url={currentUrl} />
+          </div>
+
+          {/* Article Body */}
+          <div
+            className="blog-content prose prose-lg max-w-none"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+
+          {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="mt-12 pt-6 border-t border-gray-100">
+              <div className="flex flex-wrap items-center gap-2">
+                <Tag className="w-4 h-4 text-gray-400" />
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1.5 bg-gray-100 text-gray-600 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Bottom Share */}
+          <div className="mt-10 p-6 bg-gray-50 rounded-2xl">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-1 text-sm">Enjoyed this article?</h4>
+                <p className="text-gray-600 text-sm">Share it with your friends and help them discover great deals too.</p>
+              </div>
+              <ShareButtons title={post.title} url={currentUrl} />
+            </div>
+          </div>
+
+          {/* Author Card */}
+          <div className="mt-8 p-6 bg-gradient-to-br from-primary-50 via-pink-50 to-amber-50 rounded-2xl border border-primary-100">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-400 via-primary-500 to-pink-500 flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
                 {post.author.charAt(0)}
               </div>
-              <div>
-                <p className="font-medium text-gray-900 text-sm">{post.author}</p>
-                <p className="text-xs text-gray-500">Content Team</p>
+              <div className="text-center sm:text-left">
+                <h4 className="text-lg font-bold text-gray-900 mb-1">Written by {post.author}</h4>
+                <p className="text-gray-600 text-sm mb-3">
+                  Part of the Buzzee content team, helping you discover the best deals and nightlife in your city.
+                </p>
+                <Link
+                  to="/blog"
+                  className="inline-flex items-center gap-1.5 text-primary-600 font-medium text-sm hover:gap-2 transition-all"
+                >
+                  View more articles <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </div>
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4" />
-                {formatDate(post.published_at)}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4" />
-                {estimateReadTime(post.content)} min read
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Eye className="w-4 h-4" />
-                {post.view_count.toLocaleString()} views
-              </span>
-            </div>
-          </div>
-        </header>
-
-        {/* Featured Image */}
-        {post.featured_image && (
-          <div className="max-w-4xl mx-auto px-4 mb-10">
-            <div className="aspect-[2/1] rounded-2xl overflow-hidden bg-gray-100 shadow-lg">
-              <img
-                src={post.featured_image}
-                alt={post.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Main Content Area */}
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid xl:grid-cols-[1fr_240px] gap-10">
-            {/* Article Content */}
-            <div className="max-w-3xl">
-              {/* Share Buttons */}
-              <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-100">
-                <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">Share this article</span>
-                <ShareButtons title={post.title} url={currentUrl} />
-              </div>
-
-              {/* Article Body */}
-              <div
-                className="blog-content prose prose-lg max-w-none"
-                dangerouslySetInnerHTML={{ __html: post.content }}
-              />
-
-              {/* Tags */}
-              {post.tags && post.tags.length > 0 && (
-                <div className="mt-12 pt-6 border-t border-gray-100">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Tag className="w-4 h-4 text-gray-400" />
-                    {post.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1.5 bg-gray-100 text-gray-600 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Bottom Share */}
-              <div className="mt-10 p-6 bg-gray-50 rounded-2xl">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1 text-sm">Enjoyed this article?</h4>
-                    <p className="text-gray-600 text-sm">Share it with your friends and help them discover great deals too.</p>
-                  </div>
-                  <ShareButtons title={post.title} url={currentUrl} />
-                </div>
-              </div>
-
-              {/* Author Card */}
-              <div className="mt-8 p-6 bg-gradient-to-br from-primary-50 via-pink-50 to-amber-50 rounded-2xl border border-primary-100">
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-400 via-primary-500 to-pink-500 flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
-                    {post.author.charAt(0)}
-                  </div>
-                  <div className="text-center sm:text-left">
-                    <h4 className="text-lg font-bold text-gray-900 mb-1">Written by {post.author}</h4>
-                    <p className="text-gray-600 text-sm mb-3">
-                      Part of the Buzzee content team, helping you discover the best deals and nightlife in your city.
-                    </p>
-                    <Link
-                      to="/blog"
-                      className="inline-flex items-center gap-1.5 text-primary-600 font-medium text-sm hover:gap-2 transition-all"
-                    >
-                      View more articles <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Sidebar - Table of Contents */}
-            <TableOfContents content={post.content} />
           </div>
         </div>
       </article>
