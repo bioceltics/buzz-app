@@ -324,17 +324,17 @@ function TableOfContents({ content }: { content: string }) {
 
   return (
     <div className="hidden xl:block">
-      <div className="sticky top-32">
-        <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
-          <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+      <div className="sticky top-28">
+        <div className="p-5 bg-gray-50 rounded-xl border border-gray-100">
+          <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">
             On this page
           </h4>
-          <nav className="space-y-2">
+          <nav className="space-y-1.5">
             {headings.map(({ id, text }) => (
               <a
                 key={id}
                 href={`#${id}`}
-                className={`block text-sm py-1.5 transition-colors ${
+                className={`block text-sm py-1 transition-colors line-clamp-2 ${
                   activeId === id
                     ? 'text-primary-600 font-medium'
                     : 'text-gray-500 hover:text-gray-900'
@@ -370,54 +370,54 @@ function RelatedPosts({ currentSlug }: { currentSlug: string }) {
   if (posts.length === 0) return null;
 
   return (
-    <section className="py-20 px-4 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-12">
+    <section className="py-12 px-4 bg-gray-50">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Continue Reading</h2>
-            <p className="text-gray-600">More articles you might enjoy</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-1">Continue Reading</h2>
+            <p className="text-gray-600 text-sm">More articles you might enjoy</p>
           </div>
           <Link
             to="/blog"
-            className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 font-medium rounded-full hover:border-gray-300 hover:bg-gray-50 transition-all"
+            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 font-medium text-sm rounded-full hover:border-gray-300 hover:bg-gray-50 transition-all"
           >
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => {
             const categoryColor = getCategoryColor(post.category);
             return (
               <Link
                 key={post.id}
                 to={`/blog/${post.slug}`}
-                className="group bg-white rounded-3xl overflow-hidden border border-gray-100 hover:border-primary-200 hover:shadow-2xl hover:shadow-primary-500/10 transition-all duration-500"
+                className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-primary-200 hover:shadow-xl transition-all duration-300"
               >
-                <div className="aspect-[16/10] bg-gradient-to-br from-primary-100 via-pink-50 to-amber-50 relative overflow-hidden">
+                <div className="aspect-[16/9] bg-gradient-to-br from-primary-100 via-pink-50 to-amber-50 relative overflow-hidden">
                   {post.featured_image ? (
                     <img
                       src={post.featured_image}
                       alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <BookOpen className="w-12 h-12 text-primary-400" />
+                      <BookOpen className="w-10 h-10 text-primary-400" />
                     </div>
                   )}
-                  <div className="absolute top-4 left-4">
-                    <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border backdrop-blur-sm ${categoryColor.bg} ${categoryColor.text} ${categoryColor.border}`}>
+                  <div className="absolute top-3 left-3">
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${categoryColor.bg} ${categoryColor.text} ${categoryColor.border}`}>
                       {post.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </span>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="font-bold text-lg text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2 mb-3">
+                <div className="p-5">
+                  <h3 className="font-bold text-base text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2 mb-2">
                     {post.title}
                   </h3>
-                  <p className="text-gray-600 text-sm line-clamp-2 mb-4">{post.excerpt}</p>
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <p className="text-gray-600 text-sm line-clamp-2 mb-3">{post.excerpt}</p>
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
                     <span>{formatDate(post.published_at)}</span>
                     <span className="w-1 h-1 rounded-full bg-gray-300" />
                     <span>{estimateReadTime(post.content || post.excerpt)} min read</span>
@@ -557,15 +557,15 @@ export default function BlogPostPage() {
       <Navigation />
       <FloatingActionBar title={post.title} url={currentUrl} />
 
-      <article className="pt-32 pb-20">
+      <article className="pt-28 pb-16">
         {/* Article Header */}
-        <header className="max-w-4xl mx-auto px-4 mb-12">
+        <header className="max-w-3xl mx-auto px-4 mb-10">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
+          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
-            <ChevronLeft className="w-4 h-4 rotate-180" />
+            <ChevronLeft className="w-3.5 h-3.5 rotate-180" />
             <Link to="/blog" className="hover:text-gray-900 transition-colors">Blog</Link>
-            <ChevronLeft className="w-4 h-4 rotate-180" />
+            <ChevronLeft className="w-3.5 h-3.5 rotate-180" />
             <Link to={`/blog?category=${post.category}`} className="hover:text-gray-900 transition-colors capitalize">
               {post.category.replace(/-/g, ' ')}
             </Link>
@@ -574,42 +574,42 @@ export default function BlogPostPage() {
           {/* Category Badge */}
           <Link
             to={`/blog?category=${post.category}`}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border mb-6 hover:scale-105 transition-transform ${categoryColor.bg} ${categoryColor.text} ${categoryColor.border}`}
+            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border mb-4 hover:scale-105 transition-transform ${categoryColor.bg} ${categoryColor.text} ${categoryColor.border}`}
           >
             {post.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
           </Link>
 
           {/* Title */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-[1.1] tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-5 leading-tight">
             {post.title}
           </h1>
 
           {/* Excerpt */}
-          <p className="text-xl text-gray-600 leading-relaxed mb-8">
+          <p className="text-lg text-gray-600 leading-relaxed mb-6">
             {post.excerpt}
           </p>
 
           {/* Meta Info */}
-          <div className="flex flex-wrap items-center gap-6 pb-8 border-b border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 via-primary-500 to-pink-500 flex items-center justify-center text-white text-lg font-bold shadow-lg shadow-primary-500/30">
+          <div className="flex flex-wrap items-center gap-4 pb-6 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 via-primary-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold">
                 {post.author.charAt(0)}
               </div>
               <div>
-                <p className="font-semibold text-gray-900">{post.author}</p>
-                <p className="text-sm text-gray-500">Content Team</p>
+                <p className="font-medium text-gray-900 text-sm">{post.author}</p>
+                <p className="text-xs text-gray-500">Content Team</p>
               </div>
             </div>
-            <div className="flex items-center gap-6 text-sm text-gray-500">
-              <span className="flex items-center gap-2">
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              <span className="flex items-center gap-1.5">
                 <Calendar className="w-4 h-4" />
                 {formatDate(post.published_at)}
               </span>
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4" />
                 {estimateReadTime(post.content)} min read
               </span>
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-1.5">
                 <Eye className="w-4 h-4" />
                 {post.view_count.toLocaleString()} views
               </span>
@@ -619,8 +619,8 @@ export default function BlogPostPage() {
 
         {/* Featured Image */}
         {post.featured_image && (
-          <div className="max-w-6xl mx-auto px-4 mb-16">
-            <div className="aspect-[21/9] rounded-3xl overflow-hidden bg-gray-100 shadow-2xl shadow-gray-900/10">
+          <div className="max-w-4xl mx-auto px-4 mb-10">
+            <div className="aspect-[2/1] rounded-2xl overflow-hidden bg-gray-100 shadow-lg">
               <img
                 src={post.featured_image}
                 alt={post.title}
@@ -631,12 +631,12 @@ export default function BlogPostPage() {
         )}
 
         {/* Main Content Area */}
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid xl:grid-cols-[1fr_280px] gap-12">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid xl:grid-cols-[1fr_240px] gap-10">
             {/* Article Content */}
-            <div className="max-w-4xl">
+            <div className="max-w-3xl">
               {/* Share Buttons */}
-              <div className="flex items-center justify-between mb-10 pb-8 border-b border-gray-100">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">Share this article</span>
                 <ShareButtons title={post.title} url={currentUrl} />
               </div>
@@ -649,13 +649,13 @@ export default function BlogPostPage() {
 
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
-                <div className="mt-16 pt-8 border-t border-gray-100">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Tag className="w-5 h-5 text-gray-400" />
+                <div className="mt-12 pt-6 border-t border-gray-100">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Tag className="w-4 h-4 text-gray-400" />
                     {post.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-4 py-2 bg-gray-100 text-gray-600 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
+                        className="px-3 py-1.5 bg-gray-100 text-gray-600 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
                       >
                         {tag}
                       </span>
@@ -665,30 +665,30 @@ export default function BlogPostPage() {
               )}
 
               {/* Bottom Share */}
-              <div className="mt-12 p-8 bg-gray-50 rounded-3xl">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="mt-10 p-6 bg-gray-50 rounded-2xl">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div>
-                    <h4 className="font-bold text-gray-900 mb-1">Enjoyed this article?</h4>
-                    <p className="text-gray-600">Share it with your friends and help them discover great deals too.</p>
+                    <h4 className="font-semibold text-gray-900 mb-1 text-sm">Enjoyed this article?</h4>
+                    <p className="text-gray-600 text-sm">Share it with your friends and help them discover great deals too.</p>
                   </div>
                   <ShareButtons title={post.title} url={currentUrl} />
                 </div>
               </div>
 
               {/* Author Card */}
-              <div className="mt-12 p-8 bg-gradient-to-br from-primary-50 via-pink-50 to-amber-50 rounded-3xl border border-primary-100">
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-400 via-primary-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold shadow-xl shadow-primary-500/30 flex-shrink-0">
+              <div className="mt-8 p-6 bg-gradient-to-br from-primary-50 via-pink-50 to-amber-50 rounded-2xl border border-primary-100">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-400 via-primary-500 to-pink-500 flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
                     {post.author.charAt(0)}
                   </div>
                   <div className="text-center sm:text-left">
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">Written by {post.author}</h4>
-                    <p className="text-gray-600 mb-4">
-                      Part of the Buzzee content team, dedicated to helping you discover the best deals, restaurants, and nightlife in your city.
+                    <h4 className="text-lg font-bold text-gray-900 mb-1">Written by {post.author}</h4>
+                    <p className="text-gray-600 text-sm mb-3">
+                      Part of the Buzzee content team, helping you discover the best deals and nightlife in your city.
                     </p>
                     <Link
                       to="/blog"
-                      className="inline-flex items-center gap-2 text-primary-600 font-semibold hover:gap-3 transition-all"
+                      className="inline-flex items-center gap-1.5 text-primary-600 font-medium text-sm hover:gap-2 transition-all"
                     >
                       View more articles <ArrowRight className="w-4 h-4" />
                     </Link>
@@ -707,32 +707,28 @@ export default function BlogPostPage() {
       {slug && <RelatedPosts currentSlug={slug} />}
 
       {/* CTA Section */}
-      <section className="py-24 px-4 bg-gradient-to-br from-primary-500 via-primary-600 to-pink-500 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-        </div>
-
-        <div className="max-w-3xl mx-auto text-center relative">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-6">
+      <section className="py-16 px-4 bg-gradient-to-br from-primary-500 via-primary-600 to-pink-500">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-4">
             <Sparkles className="w-4 h-4" />
             Download Now
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
             Never Miss a Deal Again
           </h2>
-          <p className="text-xl text-white/80 mb-10 max-w-xl mx-auto">
-            Get the Buzzee app and discover live deals at restaurants, bars, and clubs near you. Start saving today.
+          <p className="text-base text-white/80 mb-8 max-w-md mx-auto">
+            Get the Buzzee app and discover live deals at restaurants, bars, and clubs near you.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href="#"
-              className="px-8 py-4 bg-white text-primary-600 font-semibold rounded-full hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl"
+              className="px-6 py-3 bg-white text-primary-600 font-medium rounded-full hover:bg-gray-100 transition-all text-sm"
             >
               Download for iOS
             </a>
             <a
               href="#"
-              className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full hover:bg-white/30 transition-all border border-white/30"
+              className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white font-medium rounded-full hover:bg-white/30 transition-all border border-white/30 text-sm"
             >
               Get for Android
             </a>
@@ -741,21 +737,21 @@ export default function BlogPostPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 bg-gray-900">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center">
-                <BuzzeeIcon className="w-6 h-6" />
+      <footer className="py-8 px-4 bg-gray-900">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center">
+                <BuzzeeIcon className="w-5 h-5" />
               </div>
-              <span className="text-xl font-bold text-white">Buzzee</span>
+              <span className="text-lg font-bold text-white">Buzzee</span>
             </Link>
-            <div className="flex items-center gap-8 text-gray-400">
+            <div className="flex items-center gap-6 text-sm text-gray-400">
               <Link to="/" className="hover:text-white transition-colors">Home</Link>
               <Link to="/blog" className="hover:text-white transition-colors">Blog</Link>
               <a href="https://business.buzzee.ca" className="hover:text-white transition-colors">For Business</a>
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-xs">
               &copy; {new Date().getFullYear()} Buzzee. All rights reserved.
             </p>
           </div>

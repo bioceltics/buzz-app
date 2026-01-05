@@ -151,27 +151,26 @@ function FeaturedPost({ post }: { post: BlogPost }) {
 
   return (
     <Link to={`/blog/${post.slug}`} className="group relative block">
-      <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-center">
         {/* Image */}
-        <div className="relative aspect-[4/3] lg:aspect-[3/2] rounded-3xl overflow-hidden bg-gradient-to-br from-primary-100 via-pink-50 to-amber-50">
+        <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-gradient-to-br from-primary-100 via-pink-50 to-amber-50">
           {post.featured_image ? (
             <img
               src={post.featured_image}
               alt={post.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-24 h-24 rounded-3xl bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-xl">
-                <Sparkles className="w-12 h-12 text-primary-500" />
+              <div className="w-20 h-20 rounded-2xl bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                <Sparkles className="w-10 h-10 text-primary-500" />
               </div>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
           {/* Featured Badge */}
-          <div className="absolute top-6 left-6">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/95 backdrop-blur-sm rounded-full text-sm font-semibold text-gray-900 shadow-lg">
+          <div className="absolute top-4 left-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full text-sm font-medium text-gray-900 shadow-md">
               <TrendingUp className="w-4 h-4 text-primary-500" />
               Featured
             </span>
@@ -179,22 +178,22 @@ function FeaturedPost({ post }: { post: BlogPost }) {
         </div>
 
         {/* Content */}
-        <div className="space-y-6">
-          <div className={`inline-flex px-4 py-1.5 rounded-full text-sm font-semibold border ${categoryColor.bg} ${categoryColor.text} ${categoryColor.border}`}>
+        <div className="space-y-4 lg:space-y-5">
+          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium border ${categoryColor.bg} ${categoryColor.text} ${categoryColor.border}`}>
             {post.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight group-hover:text-primary-600 transition-colors duration-300">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight group-hover:text-primary-600 transition-colors duration-300">
             {post.title}
           </h2>
 
-          <p className="text-lg text-gray-600 leading-relaxed line-clamp-3">
+          <p className="text-base lg:text-lg text-gray-600 leading-relaxed line-clamp-3">
             {post.excerpt}
           </p>
 
-          <div className="flex items-center gap-6 text-sm text-gray-500">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-pink-400 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-pink-400 flex items-center justify-center text-white text-xs font-bold">
                 {post.author.charAt(0)}
               </div>
               {post.author}
@@ -209,7 +208,7 @@ function FeaturedPost({ post }: { post: BlogPost }) {
             </span>
           </div>
 
-          <div className="inline-flex items-center gap-2 text-primary-600 font-semibold group-hover:gap-4 transition-all duration-300">
+          <div className="inline-flex items-center gap-2 text-primary-600 font-semibold group-hover:gap-3 transition-all duration-300 pt-2">
             Read Article
             <ArrowRight className="w-5 h-5" />
           </div>
@@ -225,24 +224,24 @@ function BlogCard({ post, variant = 'default' }: { post: BlogPost; variant?: 'de
 
   if (variant === 'compact') {
     return (
-      <Link to={`/blog/${post.slug}`} className="group flex gap-5 p-4 -mx-4 rounded-2xl hover:bg-gray-50 transition-all duration-300">
-        <div className="w-28 h-28 flex-shrink-0 rounded-2xl overflow-hidden bg-gradient-to-br from-primary-100 to-pink-100">
+      <Link to={`/blog/${post.slug}`} className="group flex gap-4 p-3 rounded-xl hover:bg-gray-50 transition-all duration-300">
+        <div className="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-primary-100 to-pink-100">
           {post.featured_image ? (
             <img src={post.featured_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <BookOpen className="w-8 h-8 text-primary-400" />
+              <BookOpen className="w-6 h-6 text-primary-400" />
             </div>
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mb-2 ${categoryColor.bg} ${categoryColor.text}`}>
+          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium mb-1.5 ${categoryColor.bg} ${categoryColor.text}`}>
             {post.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
           </span>
-          <h3 className="font-bold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2 mb-1">
+          <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2 text-sm leading-snug">
             {post.title}
           </h3>
-          <div className="flex items-center gap-3 text-xs text-gray-500">
+          <div className="flex items-center gap-2 text-xs text-gray-500 mt-1.5">
             <span>{formatDate(post.published_at)}</span>
             <span className="w-1 h-1 rounded-full bg-gray-300" />
             <span>{estimateReadTime(post.excerpt)} min</span>
@@ -253,60 +252,51 @@ function BlogCard({ post, variant = 'default' }: { post: BlogPost; variant?: 'de
   }
 
   return (
-    <Link to={`/blog/${post.slug}`} className="group flex flex-col h-full bg-white rounded-3xl overflow-hidden border border-gray-100 hover:border-primary-200 hover:shadow-2xl hover:shadow-primary-500/10 transition-all duration-500">
+    <Link to={`/blog/${post.slug}`} className="group flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-primary-200 hover:shadow-xl transition-all duration-300">
       {/* Image */}
-      <div className="aspect-[16/10] bg-gradient-to-br from-primary-100 via-pink-50 to-amber-50 relative overflow-hidden">
+      <div className="aspect-[16/9] bg-gradient-to-br from-primary-100 via-pink-50 to-amber-50 relative overflow-hidden">
         {post.featured_image ? (
           <img
             src={post.featured_image}
             alt={post.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-2xl bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <BookOpen className="w-8 h-8 text-primary-500" />
+            <div className="w-14 h-14 rounded-xl bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-md">
+              <BookOpen className="w-7 h-7 text-primary-500" />
             </div>
           </div>
         )}
 
         {/* Category Badge */}
-        <div className="absolute top-4 left-4">
-          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border backdrop-blur-sm ${categoryColor.bg} ${categoryColor.text} ${categoryColor.border}`}>
+        <div className="absolute top-3 left-3">
+          <span className={`px-2.5 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${categoryColor.bg} ${categoryColor.text} ${categoryColor.border}`}>
             {post.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-          </span>
-        </div>
-
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-6">
-          <span className="px-5 py-2.5 bg-white rounded-full text-sm font-semibold text-gray-900 flex items-center gap-2 shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-            Read Article <ArrowRight className="w-4 h-4" />
           </span>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-6 flex flex-col">
-        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors line-clamp-2">
+      <div className="flex-1 p-5 flex flex-col">
+        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2 leading-snug">
           {post.title}
         </h3>
-        <p className="text-gray-600 mb-5 line-clamp-2 flex-1">
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-1 leading-relaxed">
           {post.excerpt}
         </p>
 
         {/* Meta */}
-        <div className="flex items-center justify-between text-sm pt-5 border-t border-gray-100">
+        <div className="flex items-center justify-between text-sm pt-4 border-t border-gray-100">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-pink-400 flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary-400 to-pink-400 flex items-center justify-center text-white text-xs font-bold">
               {post.author.charAt(0)}
             </div>
-            <span className="text-gray-600">{post.author}</span>
+            <span className="text-gray-600 text-sm">{post.author}</span>
           </div>
-          <div className="flex items-center gap-3 text-gray-400">
-            <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" />
-              {estimateReadTime(post.excerpt)} min
-            </span>
+          <div className="flex items-center gap-1 text-gray-400 text-sm">
+            <Clock className="w-3.5 h-3.5" />
+            <span>{estimateReadTime(post.excerpt)} min</span>
           </div>
         </div>
       </div>
@@ -325,12 +315,12 @@ function CategoryFilter({
   onSelect: (slug: string | null) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="flex flex-wrap gap-2">
       <button
         onClick={() => onSelect(null)}
-        className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
           !activeCategory
-            ? 'bg-gray-900 text-white shadow-lg shadow-gray-900/20'
+            ? 'bg-gray-900 text-white'
             : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50'
         }`}
       >
@@ -342,9 +332,9 @@ function CategoryFilter({
           <button
             key={category.id}
             onClick={() => onSelect(category.slug)}
-            className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
               activeCategory === category.slug
-                ? 'bg-gray-900 text-white shadow-lg shadow-gray-900/20'
+                ? 'bg-gray-900 text-white'
                 : `bg-white border ${colors.border} ${colors.text} hover:bg-gray-50`
             }`}
           >
@@ -361,16 +351,16 @@ function Pagination({ pagination, onPageChange }: { pagination: PaginationInfo; 
   if (pagination.totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-16">
+    <div className="flex items-center justify-center gap-1.5 mt-10">
       <button
         onClick={() => onPageChange(pagination.page - 1)}
         disabled={pagination.page === 1}
-        className="w-12 h-12 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center"
+        className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className="w-4 h-4" />
       </button>
 
-      <div className="flex items-center gap-1 px-2">
+      <div className="flex items-center gap-1 px-1">
         {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
           .filter((page) => {
             const distance = Math.abs(page - pagination.page);
@@ -382,13 +372,13 @@ function Pagination({ pagination, onPageChange }: { pagination: PaginationInfo; 
 
             return (
               <div key={page} className="flex items-center gap-1">
-                {showEllipsis && <span className="px-3 text-gray-400">...</span>}
+                {showEllipsis && <span className="px-2 text-gray-400 text-sm">...</span>}
                 <button
                   onClick={() => onPageChange(page)}
-                  className={`w-12 h-12 rounded-xl font-semibold transition-all ${
+                  className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
                     page === pagination.page
-                      ? 'bg-gray-900 text-white shadow-lg shadow-gray-900/20'
-                      : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                   }`}
                 >
                   {page}
@@ -401,9 +391,9 @@ function Pagination({ pagination, onPageChange }: { pagination: PaginationInfo; 
       <button
         onClick={() => onPageChange(pagination.page + 1)}
         disabled={pagination.page === pagination.totalPages}
-        className="w-12 h-12 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center"
+        className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center"
       >
-        <ChevronRight className="w-5 h-5" />
+        <ChevronRight className="w-4 h-4" />
       </button>
     </div>
   );
@@ -484,38 +474,33 @@ export default function BlogPage() {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 bg-gradient-to-b from-white via-white to-gray-50 relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-[0.02]">
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, gray 1px, transparent 0)', backgroundSize: '40px 40px' }} />
-        </div>
-
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-primary-600 text-sm font-semibold mb-6">
+      <section className="pt-28 pb-12 px-4 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-50 rounded-full text-primary-600 text-sm font-medium mb-4">
               <Sparkles className="w-4 h-4" />
               Discover, Learn, Save
             </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
               The Buzzee <span className="bg-gradient-to-r from-primary-500 to-pink-500 bg-clip-text text-transparent">Blog</span>
             </h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              Expert insights on finding the best deals, restaurant guides, nightlife tips, and the latest food trends in your city.
+            <p className="text-lg text-gray-600 leading-relaxed">
+              Expert insights on deals, restaurants, nightlife, and food trends in your city.
             </p>
           </div>
 
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-xl mx-auto">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-6 py-5 pl-14 rounded-2xl bg-white border border-gray-200 focus:border-primary-400 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all text-lg shadow-sm"
+                className="w-full px-5 py-3.5 pl-12 rounded-xl bg-white border border-gray-200 focus:border-primary-400 focus:ring-2 focus:ring-primary-500/10 outline-none transition-all text-base shadow-sm"
               />
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-all">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <button className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-all">
                 Search
               </button>
             </div>
@@ -524,8 +509,8 @@ export default function BlogPage() {
       </section>
 
       {/* Category Filter */}
-      <section className="py-8 px-4 bg-white border-y border-gray-100 sticky top-20 z-30">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-4 px-4 bg-white border-y border-gray-100 sticky top-20 z-30">
+        <div className="max-w-5xl mx-auto">
           <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
             <CategoryFilter categories={categories} activeCategory={activeCategory} onSelect={handleCategorySelect} />
           </div>
@@ -533,29 +518,29 @@ export default function BlogPage() {
       </section>
 
       {/* Main Content */}
-      <section className="py-16 px-4">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-10 px-4">
+        <div className="max-w-5xl mx-auto">
           {loading ? (
-            <div className="space-y-16">
+            <div className="space-y-10">
               {/* Featured skeleton */}
-              <div className="grid lg:grid-cols-2 gap-12 items-center animate-pulse">
-                <div className="aspect-[4/3] lg:aspect-[3/2] rounded-3xl bg-gray-200" />
-                <div className="space-y-6">
-                  <div className="h-6 bg-gray-200 rounded-full w-24" />
-                  <div className="h-12 bg-gray-200 rounded-xl w-full" />
-                  <div className="h-12 bg-gray-200 rounded-xl w-3/4" />
-                  <div className="h-6 bg-gray-200 rounded-lg w-full" />
-                  <div className="h-6 bg-gray-200 rounded-lg w-2/3" />
+              <div className="grid lg:grid-cols-2 gap-8 items-center animate-pulse">
+                <div className="aspect-[16/10] rounded-2xl bg-gray-200" />
+                <div className="space-y-4">
+                  <div className="h-5 bg-gray-200 rounded-full w-20" />
+                  <div className="h-10 bg-gray-200 rounded-lg w-full" />
+                  <div className="h-10 bg-gray-200 rounded-lg w-3/4" />
+                  <div className="h-5 bg-gray-200 rounded-lg w-full" />
+                  <div className="h-5 bg-gray-200 rounded-lg w-2/3" />
                 </div>
               </div>
 
               {/* Grid skeleton */}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="bg-white rounded-3xl overflow-hidden border border-gray-100 animate-pulse">
-                    <div className="aspect-[16/10] bg-gray-200" />
-                    <div className="p-6 space-y-4">
-                      <div className="h-6 bg-gray-200 rounded-lg" />
+                  <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
+                    <div className="aspect-[16/9] bg-gray-200" />
+                    <div className="p-5 space-y-3">
+                      <div className="h-5 bg-gray-200 rounded-lg" />
                       <div className="h-4 bg-gray-200 rounded-lg w-3/4" />
                       <div className="h-4 bg-gray-200 rounded-lg w-1/2" />
                     </div>
@@ -567,24 +552,24 @@ export default function BlogPage() {
             <>
               {/* Featured Post */}
               {currentPage === 1 && !activeCategory && featuredPost && (
-                <div className="mb-20">
+                <div className="mb-12">
                   <FeaturedPost post={featuredPost} />
                 </div>
               )}
 
               {/* Section Header */}
-              <div className="flex items-center justify-between mb-10">
-                <h2 className="text-2xl font-bold text-gray-900">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">
                   {activeCategory
                     ? `${activeCategory.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Articles`
                     : 'Latest Articles'
                   }
                 </h2>
-                <span className="text-gray-500">{pagination.total} articles</span>
+                <span className="text-sm text-gray-500">{pagination.total} articles</span>
               </div>
 
               {/* Posts Grid */}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(currentPage === 1 && !activeCategory ? remainingPosts : posts).map((post) => (
                   <BlogCard key={post.id} post={post} />
                 ))}
@@ -593,12 +578,12 @@ export default function BlogPage() {
               <Pagination pagination={pagination} onPageChange={handlePageChange} />
             </>
           ) : (
-            <div className="text-center py-24">
-              <div className="w-24 h-24 rounded-3xl bg-gray-100 flex items-center justify-center mx-auto mb-8">
-                <BookOpen className="w-12 h-12 text-gray-400" />
+            <div className="text-center py-16">
+              <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-6">
+                <BookOpen className="w-10 h-10 text-gray-400" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">No articles found</h3>
-              <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">No articles found</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto text-sm">
                 {activeCategory
                   ? 'No articles in this category yet. Check back soon for fresh content!'
                   : 'We\'re working on bringing you great content. Check back soon!'}
@@ -606,7 +591,7 @@ export default function BlogPage() {
               {activeCategory && (
                 <button
                   onClick={() => handleCategorySelect(null)}
-                  className="px-8 py-4 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/20"
+                  className="px-6 py-3 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all text-sm"
                 >
                   View All Articles
                 </button>
@@ -617,52 +602,48 @@ export default function BlogPage() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-24 px-4 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-        </div>
-
-        <div className="max-w-3xl mx-auto text-center relative">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-white/80 text-sm font-medium mb-6">
+      <section className="py-16 px-4 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-full text-white/80 text-sm font-medium mb-4">
             <Sparkles className="w-4 h-4" />
             Join 10,000+ readers
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
             Never Miss a Deal
           </h2>
-          <p className="text-xl text-gray-400 mb-10 max-w-xl mx-auto">
-            Get exclusive deals, restaurant recommendations, and nightlife tips delivered to your inbox weekly.
+          <p className="text-base text-gray-400 mb-8 max-w-md mx-auto">
+            Get exclusive deals and nightlife tips delivered to your inbox weekly.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-6 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30 focus:ring-2 focus:ring-white/20 outline-none transition-all"
+              className="flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30 outline-none transition-all text-sm"
             />
-            <button className="px-8 py-4 bg-white text-gray-900 font-semibold rounded-xl hover:bg-gray-100 transition-all shadow-lg">
+            <button className="px-6 py-3 bg-white text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-all text-sm">
               Subscribe
             </button>
           </div>
-          <p className="text-sm text-gray-500 mt-4">No spam, unsubscribe anytime.</p>
+          <p className="text-xs text-gray-500 mt-3">No spam, unsubscribe anytime.</p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 bg-gray-900 border-t border-gray-800">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center">
-                <BuzzeeIcon className="w-6 h-6" />
+      <footer className="py-8 px-4 bg-gray-900 border-t border-gray-800">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center">
+                <BuzzeeIcon className="w-5 h-5" />
               </div>
-              <span className="text-xl font-bold text-white">Buzzee</span>
+              <span className="text-lg font-bold text-white">Buzzee</span>
             </Link>
-            <div className="flex items-center gap-8 text-gray-400">
+            <div className="flex items-center gap-6 text-sm text-gray-400">
               <Link to="/" className="hover:text-white transition-colors">Home</Link>
               <Link to="/blog" className="hover:text-white transition-colors">Blog</Link>
               <a href="https://business.buzzee.ca" className="hover:text-white transition-colors">For Business</a>
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-xs">
               &copy; {new Date().getFullYear()} Buzzee. All rights reserved.
             </p>
           </div>
