@@ -31,6 +31,7 @@ interface BlogPost {
   excerpt: string;
   content: string;
   featured_image: string | null;
+  image_credit: string | null;
   author: string;
   category: string;
   tags: string[];
@@ -561,6 +562,12 @@ export default function BlogPostPage() {
                   className="w-full h-full object-cover"
                 />
               </div>
+              {post.image_credit && (
+                <p
+                  className="text-xs text-gray-500 mt-2 text-center"
+                  dangerouslySetInnerHTML={{ __html: post.image_credit }}
+                />
+              )}
             </div>
           )}
 

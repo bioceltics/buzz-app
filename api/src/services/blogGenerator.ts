@@ -199,6 +199,7 @@ interface GeneratedBlogPost {
   excerpt: string;
   content: string;
   featured_image: string | null;
+  image_credit: string | null;
   category: string;
   tags: string[];
   meta_title: string;
@@ -395,18 +396,13 @@ IMPORTANT: Output clean, properly-formatted HTML. Avoid nested tags incorrectly 
       }
       const image = await imagePromise;
 
-      // Add image credit to content if we have an image
-      let content = parsed.content;
-      if (image) {
-        content = this.addImageCredit(content, image);
-      }
-
       return {
         title: parsed.title,
         slug: parsed.slug || this.generateSlug(parsed.title),
         excerpt: parsed.excerpt,
-        content: content,
+        content: parsed.content,
         featured_image: image?.url || null,
+        image_credit: image ? this.buildImageCredit(image) : null,
         category: category || 'general',
         tags: parsed.tags || [],
         meta_title: parsed.meta_title || parsed.title,
@@ -475,13 +471,14 @@ ${relatedLinksHtml}
 </div>
 
 REQUIREMENTS:
-- Write 1500+ words of valuable content
+- Write 1000+ words of valuable content (approximately 5 minute read)
 - Use <div class="section-divider"></div> between major sections
 - Include 3-4 statistics/percentages for credibility
 - Add 2-3 internal links naturally: <a href="/blog/slug">text</a>
 - Use <strong> for key terms, <em> for emphasis
 - Keep paragraphs short (2-4 sentences)
 - Mention Buzzee 2-3 times as helpful tool
+- Make content comprehensive with multiple sections and examples
 
 Return ONLY valid JSON (no markdown):
 {
@@ -521,18 +518,10 @@ Return ONLY valid JSON (no markdown):
   }
 
   /**
-   * Add image attribution to the content
+   * Build image credit HTML (used by frontend, not inserted into content)
    */
-  private addImageCredit(content: string, image: UnsplashImage): string {
-    const credit = `<p class="image-credit"><em>Photo by <a href="${image.photographerUrl}?utm_source=buzzee&utm_medium=referral" target="_blank" rel="noopener noreferrer">${image.photographer}</a> on <a href="https://unsplash.com?utm_source=buzzee&utm_medium=referral" target="_blank" rel="noopener noreferrer">Unsplash</a></em></p>`;
-
-    // Add credit after the first paragraph
-    const firstParagraphEnd = content.indexOf('</p>');
-    if (firstParagraphEnd > -1) {
-      return content.slice(0, firstParagraphEnd + 4) + credit + content.slice(firstParagraphEnd + 4);
-    }
-
-    return credit + content;
+  private buildImageCredit(image: UnsplashImage): string {
+    return `Photo by <a href="${image.photographerUrl}?utm_source=buzzee&utm_medium=referral" target="_blank" rel="noopener noreferrer">${image.photographer}</a> on <a href="https://unsplash.com?utm_source=buzzee&utm_medium=referral" target="_blank" rel="noopener noreferrer">Unsplash</a>`;
   }
 
   /**
@@ -577,6 +566,7 @@ Return ONLY valid JSON (no markdown):
           excerpt: generatedPost.excerpt,
           content: generatedPost.content,
           featured_image: generatedPost.featured_image,
+          image_credit: generatedPost.image_credit,
           category: generatedPost.category,
           tags: generatedPost.tags,
           meta_title: generatedPost.meta_title,
@@ -674,19 +664,12 @@ Return ONLY valid JSON (no markdown):
   private getFallbackPost(topic: string, category: string, image: UnsplashImage | null): GeneratedBlogPost {
     const slug = this.generateSlug(topic);
 
-    let imageCredit = '';
-    if (image) {
-      imageCredit = `<p class="image-credit"><em>Photo by <a href="${image.photographerUrl}?utm_source=buzzee&utm_medium=referral" target="_blank" rel="noopener noreferrer">${image.photographer}</a> on <a href="https://unsplash.com?utm_source=buzzee&utm_medium=referral" target="_blank" rel="noopener noreferrer">Unsplash</a></em></p>`;
-    }
-
     return {
       title: topic,
       slug: slug,
       excerpt: `Discover expert insights about ${topic.toLowerCase()}. Learn proven tips and strategies to enhance your dining and nightlife experiences.`,
       content: `
 <p>Whether you're a seasoned foodie or just starting to explore your city's culinary scene, understanding ${topic.toLowerCase()} can transform how you experience dining out. In this comprehensive guide, we'll walk you through everything you need to know.</p>
-
-${imageCredit}
 
 <h2>Why This Matters More Than Ever</h2>
 <p>In today's dynamic restaurant landscape, savvy diners know that the best experiences often come from being informed and prepared. The difference between an ordinary meal and an extraordinary one often lies in the details—timing, location, and knowing where to find the best value.</p>
@@ -734,6 +717,7 @@ ${imageCredit}
 <p>What's your favorite dining strategy? The best approach is one that fits your lifestyle and preferences. Experiment, stay curious, and enjoy the journey of discovering great food and drink in your city.</p>
       `.trim(),
       featured_image: image?.url || null,
+      image_credit: image ? this.buildImageCredit(image) : null,
       category,
       tags: ['deals', 'restaurants', 'nightlife', 'dining tips', 'local gems'],
       meta_title: topic.length > 60 ? topic.slice(0, 57) + '...' : topic,
