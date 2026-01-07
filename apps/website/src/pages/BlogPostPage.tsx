@@ -682,6 +682,11 @@ export default function BlogPostPage() {
               <Link to="/blog" className="hover:text-white transition-colors">Blog</Link>
               <a href="https://business.buzzee.ca" className="hover:text-white transition-colors">For Business</a>
             </div>
+            <div className="flex items-center gap-6 text-sm text-gray-400">
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+              <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
+              <Link to="/cookies" className="hover:text-white transition-colors">Cookies</Link>
+            </div>
             <p className="text-gray-500 text-xs">
               &copy; {new Date().getFullYear()} Buzzee. All rights reserved.
             </p>
