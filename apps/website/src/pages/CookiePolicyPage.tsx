@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ChevronRight } from 'lucide-react';
+import { Menu, X, ChevronRight, Cookie, Mail, MapPin, Globe, Calendar, Settings, Info } from 'lucide-react';
 
-// Custom Buzzee Logo Icon
 function BuzzeeIcon({ className = "w-6 h-6" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -11,12 +10,11 @@ function BuzzeeIcon({ className = "w-6 h-6" }: { className?: string }) {
   );
 }
 
-// Navigation Component
 function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center gap-2.5">
@@ -54,7 +52,6 @@ function Navigation() {
   );
 }
 
-// Footer Component
 function Footer() {
   return (
     <footer className="py-12 px-4 bg-gray-900 text-white">
@@ -67,8 +64,8 @@ function Footer() {
               </div>
               <span className="text-2xl font-bold">Buzzee</span>
             </Link>
-            <p className="text-gray-400 text-sm">
-              Catch live deals at local venues. A product of Chant Projects Inc.
+            <p className="text-gray-400 text-sm leading-relaxed">
+              Discover live deals at local restaurants, cafes, and bars. A product of Chant Projects Inc.
             </p>
           </div>
 
@@ -107,166 +104,354 @@ function Footer() {
   );
 }
 
+function Section({ number, title, id, children }: { number: number; title: string; id: string; children: React.ReactNode }) {
+  return (
+    <div id={id} className="scroll-mt-24">
+      <div className="flex items-start gap-4 mb-6">
+        <span className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-pink-100 text-primary-600 flex items-center justify-center font-bold text-lg shadow-sm">
+          {number}
+        </span>
+        <h2 className="text-2xl font-bold text-gray-900 pt-1">{title}</h2>
+      </div>
+      <div className="pl-14 space-y-6">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Subsection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-3">
+      <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-3">
+        <span className="w-1 h-5 bg-gradient-to-b from-primary-500 to-pink-400 rounded-full"></span>
+        {title}
+      </h3>
+      <div className="pl-4 space-y-3">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function BulletList({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-2.5">
+      {items.map((item, index) => (
+        <li key={index} className="flex items-start gap-3">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary-500 mt-2 flex-shrink-0"></span>
+          <span className="text-gray-600 leading-relaxed">{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function P({ children }: { children: React.ReactNode }) {
+  return <p className="text-gray-600 leading-relaxed">{children}</p>;
+}
+
+function InfoBox({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg flex items-start gap-3">
+      <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+      <p className="text-blue-800 text-sm leading-relaxed">{children}</p>
+    </div>
+  );
+}
+
+function CookieTypeCard({ title, description, icon: Icon, items }: { title: string; description: string; icon: React.ElementType; items: string[] }) {
+  return (
+    <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-100 to-pink-100 flex items-center justify-center">
+          <Icon className="w-5 h-5 text-primary-600" />
+        </div>
+        <h4 className="font-semibold text-gray-900">{title}</h4>
+      </div>
+      <p className="text-gray-600 text-sm mb-4">{description}</p>
+      <ul className="space-y-2">
+        {items.map((item, index) => (
+          <li key={index} className="flex items-start gap-2 text-sm">
+            <span className="w-1 h-1 rounded-full bg-primary-500 mt-2 flex-shrink-0"></span>
+            <span className="text-gray-600">{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+const tocItems = [
+  { id: 'what-are-cookies', title: 'What Are Cookies' },
+  { id: 'types', title: 'Types of Cookies' },
+  { id: 'third-party', title: 'Third-Party Cookies' },
+  { id: 'duration', title: 'Cookie Duration' },
+  { id: 'managing', title: 'Managing Cookies' },
+  { id: 'do-not-track', title: 'Do Not Track' },
+  { id: 'changes', title: 'Policy Updates' },
+  { id: 'contact', title: 'Contact Us' },
+];
+
 export default function CookiePolicyPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
 
       {/* Hero Section */}
-      <section className="pt-28 pb-12 px-4 bg-gradient-to-b from-gray-50 to-white">
+      <section className="pt-28 pb-16 px-4 bg-gradient-to-b from-gray-50 via-white to-white">
         <div className="max-w-4xl mx-auto">
-          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-            <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
+          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
+            <Link to="/" className="hover:text-primary-500 transition-colors">Home</Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900">Cookie Policy</span>
+            <span className="text-gray-900 font-medium">Cookie Policy</span>
           </nav>
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">Cookie Policy</h1>
-          <p className="text-gray-600">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-pink-400 flex items-center justify-center shadow-lg shadow-primary-500/25">
+              <Cookie className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900">Cookie Policy</h1>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
+            <Calendar className="w-4 h-4" />
+            <span>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+
+          <p className="text-xl text-gray-600 leading-relaxed max-w-3xl">
+            This Cookie Policy explains how Chant Projects Inc. uses cookies and similar technologies when you visit our website or use the Buzzee mobile application. By using our service, you consent to cookies as described here.
+          </p>
+        </div>
+      </section>
+
+      {/* Table of Contents */}
+      <section className="py-6 px-4 bg-gray-50 border-y border-gray-100 sticky top-16 z-40">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-sm font-semibold text-gray-900">Quick Navigation</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {tocItems.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className="px-3 py-1.5 text-sm text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+              >
+                {item.title}
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-12 px-4">
-        <div className="max-w-4xl mx-auto prose prose-gray prose-lg">
-          <p className="lead text-xl text-gray-600">
-            This Cookie Policy explains how Chant Projects Inc. ("Chants", "we", "us", or "our") uses cookies and similar technologies when you visit our website or use the Buzzee mobile application (collectively, the "Service"). By using our Service, you consent to the use of cookies as described in this policy.
-          </p>
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto space-y-16">
 
-          <h2>1. What Are Cookies?</h2>
-          <p>Cookies are small text files that are stored on your device (computer, tablet, or mobile phone) when you visit a website. They are widely used to make websites work more efficiently, provide a better user experience, and give website owners useful information about how their site is being used.</p>
-          <p>Similar technologies include:</p>
-          <ul>
-            <li><strong>Local Storage:</strong> Allows websites to store data locally on your device</li>
-            <li><strong>Session Storage:</strong> Similar to local storage but cleared when the browser session ends</li>
-            <li><strong>Pixels/Web Beacons:</strong> Small images embedded in web pages or emails to track user behavior</li>
-            <li><strong>Device Identifiers:</strong> Unique identifiers associated with your mobile device</li>
-          </ul>
+          <Section number={1} title="What Are Cookies?" id="what-are-cookies">
+            <P>Cookies are small text files stored on your device when you visit a website. They help websites work efficiently, provide a better user experience, and give site owners insights into usage patterns.</P>
 
-          <h2>2. Types of Cookies We Use</h2>
+            <Subsection title="Similar Technologies">
+              <P>In addition to cookies, we also use:</P>
+              <BulletList items={[
+                "Local Storage - Stores data locally on your device for improved performance",
+                "Session Storage - Temporary storage cleared when you close your browser",
+                "Pixels/Web Beacons - Small images that track user behavior",
+                "Device Identifiers - Unique IDs associated with your mobile device"
+              ]} />
+            </Subsection>
+          </Section>
 
-          <h3>Essential Cookies</h3>
-          <p>These cookies are necessary for the Service to function properly. They enable core functionality such as:</p>
-          <ul>
-            <li>User authentication and account access</li>
-            <li>Security features and fraud prevention</li>
-            <li>Load balancing and server optimization</li>
-            <li>Remembering your preferences and settings</li>
-          </ul>
-          <p>Without these cookies, certain features of the Service may not be available.</p>
+          <Section number={2} title="Types of Cookies We Use" id="types">
+            <P>We use different types of cookies to provide and improve our service:</P>
 
-          <h3>Analytics Cookies</h3>
-          <p>These cookies help us understand how visitors interact with our Service by collecting and reporting information anonymously. We use this data to:</p>
-          <ul>
-            <li>Measure and analyze traffic and usage patterns</li>
-            <li>Understand which pages and features are most popular</li>
-            <li>Identify errors and improve Service performance</li>
-            <li>Test new features and design changes</li>
-          </ul>
+            <div className="grid sm:grid-cols-2 gap-4 mt-6">
+              <CookieTypeCard
+                title="Essential Cookies"
+                description="Required for the service to function properly."
+                icon={Settings}
+                items={[
+                  "User authentication and login",
+                  "Security and fraud prevention",
+                  "Load balancing and performance",
+                  "Remembering your preferences"
+                ]}
+              />
+              <CookieTypeCard
+                title="Analytics Cookies"
+                description="Help us understand how you use Buzzee."
+                icon={Info}
+                items={[
+                  "Traffic and usage patterns",
+                  "Popular pages and features",
+                  "Error identification",
+                  "Performance monitoring"
+                ]}
+              />
+              <CookieTypeCard
+                title="Functional Cookies"
+                description="Enable enhanced features and personalization."
+                icon={Cookie}
+                items={[
+                  "Language preferences",
+                  "Saved deals and favorites",
+                  "Customized content",
+                  "Social sharing features"
+                ]}
+              />
+              <CookieTypeCard
+                title="Marketing Cookies"
+                description="Deliver relevant ads and measure campaign effectiveness."
+                icon={Globe}
+                items={[
+                  "Personalized advertisements",
+                  "Ad frequency limits",
+                  "Campaign measurement",
+                  "Cross-site recognition"
+                ]}
+              />
+            </div>
 
-          <h3>Functional Cookies</h3>
-          <p>These cookies enable enhanced functionality and personalization, such as:</p>
-          <ul>
-            <li>Remembering your language and region preferences</li>
-            <li>Storing your saved deals and favorite venues</li>
-            <li>Customizing content based on your interests</li>
-            <li>Enabling social media sharing features</li>
-          </ul>
+            <InfoBox>
+              Essential cookies cannot be disabled as they are necessary for the service to function. You can manage other cookie types through your browser settings.
+            </InfoBox>
+          </Section>
 
-          <h3>Marketing Cookies</h3>
-          <p>These cookies are used to deliver relevant advertisements and track the effectiveness of our marketing campaigns. They may be used to:</p>
-          <ul>
-            <li>Show you personalized ads based on your interests</li>
-            <li>Limit the number of times you see an advertisement</li>
-            <li>Measure the effectiveness of advertising campaigns</li>
-            <li>Remember that you have visited our Service when browsing other websites</li>
-          </ul>
+          <Section number={3} title="Third-Party Cookies" id="third-party">
+            <P>We work with trusted third-party providers who may place cookies on your device:</P>
 
-          <h2>3. Third-Party Cookies</h2>
-          <p>We may allow third-party service providers to place cookies on your device to help us with various functions. These providers include:</p>
+            <Subsection title="Analytics Providers">
+              <BulletList items={[
+                "Google Analytics - Helps us understand user interactions",
+                "Mixpanel - Provides detailed behavior and engagement analytics"
+              ]} />
+            </Subsection>
 
-          <h3>Analytics Providers</h3>
-          <ul>
-            <li><strong>Google Analytics:</strong> Helps us understand how users interact with our Service</li>
-            <li><strong>Mixpanel:</strong> Provides detailed analytics on user behavior and engagement</li>
-          </ul>
+            <Subsection title="Advertising Partners">
+              <BulletList items={[
+                "Google Ads - Targeted advertising and conversion tracking",
+                "Meta (Facebook) - Social media advertising and audience insights"
+              ]} />
+            </Subsection>
 
-          <h3>Advertising Partners</h3>
-          <ul>
-            <li><strong>Google Ads:</strong> For targeted advertising and conversion tracking</li>
-            <li><strong>Meta (Facebook):</strong> For social media advertising and audience insights</li>
-          </ul>
+            <Subsection title="Service Providers">
+              <BulletList items={[
+                "Stripe - Secure payment processing",
+                "Intercom - Customer support and communication"
+              ]} />
+            </Subsection>
 
-          <h3>Other Service Providers</h3>
-          <ul>
-            <li><strong>Stripe:</strong> For secure payment processing</li>
-            <li><strong>Intercom:</strong> For customer support and communication</li>
-          </ul>
+            <P>These third parties have their own privacy policies and may collect information about your activities across different websites.</P>
+          </Section>
 
-          <p>These third parties have their own privacy policies and may collect information about your online activities over time and across different websites.</p>
+          <Section number={4} title="Cookie Duration" id="duration">
+            <P>Cookies remain on your device for different periods:</P>
 
-          <h2>4. Cookie Duration</h2>
-          <p>Cookies can remain on your device for different periods of time:</p>
-          <ul>
-            <li><strong>Session Cookies:</strong> These are temporary cookies that expire when you close your browser. They are used to maintain your session while you navigate the Service.</li>
-            <li><strong>Persistent Cookies:</strong> These cookies remain on your device for a set period of time (ranging from days to years) or until you delete them. They are used to remember your preferences and recognize you when you return.</li>
-          </ul>
+            <Subsection title="Session Cookies">
+              <P>Temporary cookies that expire when you close your browser. Used to maintain your session while navigating the service.</P>
+            </Subsection>
 
-          <h2>5. Managing Your Cookie Preferences</h2>
-          <p>You have several options for managing cookies:</p>
+            <Subsection title="Persistent Cookies">
+              <P>Remain on your device for a set period (days to years) or until deleted. Used to remember preferences and recognize returning users.</P>
+            </Subsection>
+          </Section>
 
-          <h3>Browser Settings</h3>
-          <p>Most web browsers allow you to control cookies through their settings. You can:</p>
-          <ul>
-            <li>View cookies stored on your device</li>
-            <li>Delete all or specific cookies</li>
-            <li>Block all cookies or only third-party cookies</li>
-            <li>Set preferences for specific websites</li>
-          </ul>
-          <p>Please note that blocking or deleting cookies may affect the functionality of the Service.</p>
+          <Section number={5} title="Managing Your Cookie Preferences" id="managing">
+            <P>You have control over cookies on your device:</P>
 
-          <h3>Browser-Specific Instructions</h3>
-          <ul>
-            <li><strong>Chrome:</strong> Settings → Privacy and security → Cookies and other site data</li>
-            <li><strong>Firefox:</strong> Settings → Privacy & Security → Cookies and Site Data</li>
-            <li><strong>Safari:</strong> Preferences → Privacy → Cookies and website data</li>
-            <li><strong>Edge:</strong> Settings → Cookies and site permissions → Cookies and site data</li>
-          </ul>
+            <Subsection title="Browser Settings">
+              <P>Most browsers let you manage cookies. You can:</P>
+              <BulletList items={[
+                "View all cookies stored on your device",
+                "Delete all or specific cookies",
+                "Block all cookies or only third-party cookies",
+                "Set preferences for specific websites"
+              ]} />
+            </Subsection>
 
-          <h3>Mobile Devices</h3>
-          <p>For the Buzzee mobile app:</p>
-          <ul>
-            <li><strong>iOS:</strong> Settings → Privacy → Tracking to control app tracking</li>
-            <li><strong>Android:</strong> Settings → Privacy → Ads to manage ad personalization</li>
-          </ul>
+            <Subsection title="Browser-Specific Instructions">
+              <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+                <p className="text-sm"><span className="font-semibold text-gray-900">Chrome:</span> <span className="text-gray-600">Settings → Privacy and security → Cookies</span></p>
+                <p className="text-sm"><span className="font-semibold text-gray-900">Firefox:</span> <span className="text-gray-600">Settings → Privacy & Security → Cookies</span></p>
+                <p className="text-sm"><span className="font-semibold text-gray-900">Safari:</span> <span className="text-gray-600">Preferences → Privacy → Cookies</span></p>
+                <p className="text-sm"><span className="font-semibold text-gray-900">Edge:</span> <span className="text-gray-600">Settings → Cookies and site permissions</span></p>
+              </div>
+            </Subsection>
 
-          <h3>Opt-Out Tools</h3>
-          <p>You can also opt out of certain types of cookies using these tools:</p>
-          <ul>
-            <li><strong>Google Analytics Opt-out:</strong> Install the Google Analytics Opt-out Browser Add-on</li>
-            <li><strong>Digital Advertising Alliance:</strong> Visit optout.aboutads.info</li>
-            <li><strong>Network Advertising Initiative:</strong> Visit optout.networkadvertising.org</li>
-          </ul>
+            <Subsection title="Mobile App Settings">
+              <BulletList items={[
+                "iOS: Settings → Privacy → Tracking",
+                "Android: Settings → Privacy → Ads"
+              ]} />
+            </Subsection>
 
-          <h2>6. Do Not Track Signals</h2>
-          <p>Some browsers have a "Do Not Track" (DNT) feature that sends a signal to websites you visit indicating you do not wish to be tracked. Our Service currently does not respond to DNT signals, but we honor your cookie preferences as described in this policy.</p>
+            <Subsection title="Opt-Out Tools">
+              <BulletList items={[
+                "Google Analytics Opt-out Browser Add-on",
+                "Digital Advertising Alliance: optout.aboutads.info",
+                "Network Advertising Initiative: optout.networkadvertising.org"
+              ]} />
+            </Subsection>
 
-          <h2>7. Updates to This Cookie Policy</h2>
-          <p>We may update this Cookie Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will notify you of any material changes by:</p>
-          <ul>
-            <li>Posting the updated policy on this page</li>
-            <li>Updating the "Last updated" date at the top</li>
-            <li>Sending you a notification through the app or email for significant changes</li>
-          </ul>
-          <p>We encourage you to review this policy periodically to stay informed about our use of cookies.</p>
+            <InfoBox>
+              Blocking or deleting cookies may affect some features of the Buzzee service. Essential cookies are required for basic functionality.
+            </InfoBox>
+          </Section>
 
-          <h2>8. Contact Us</h2>
-          <p>If you have any questions about this Cookie Policy or our use of cookies, please contact us:</p>
-          <div className="bg-gray-50 p-6 rounded-xl not-prose">
-            <p className="font-semibold text-gray-900 mb-2">Chant Projects Inc.</p>
-            <p className="text-gray-600">Vancouver, British Columbia, Canada</p>
-            <p className="text-gray-600">Website: <a href="https://www.chants.ca" className="text-primary-600 hover:underline">www.chants.ca</a></p>
-            <p className="text-gray-600">Email: <a href="mailto:privacy@chants.ca" className="text-primary-600 hover:underline">privacy@chants.ca</a></p>
-          </div>
+          <Section number={6} title="Do Not Track Signals" id="do-not-track">
+            <P>Some browsers offer a "Do Not Track" (DNT) feature that signals websites you do not wish to be tracked. Our service currently does not respond to DNT signals, but we respect your cookie preferences as described in this policy.</P>
+          </Section>
+
+          <Section number={7} title="Updates to This Policy" id="changes">
+            <P>We may update this Cookie Policy periodically. When we make changes:</P>
+            <BulletList items={[
+              "We will post the updated policy on this page",
+              "We will update the \"Last updated\" date at the top",
+              "We will notify you through the app or email for significant changes"
+            ]} />
+            <P>We encourage you to review this policy periodically to stay informed about our cookie practices.</P>
+          </Section>
+
+          <Section number={8} title="Contact Us" id="contact">
+            <P>If you have questions about this Cookie Policy or our use of cookies, we're here to help.</P>
+
+            <div className="mt-6 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 text-white">
+              <h3 className="text-xl font-semibold mb-6">Get in Touch</h3>
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-5 h-5 text-primary-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400 mb-1">Email</p>
+                    <a href="mailto:privacy@chants.ca" className="text-white hover:text-primary-400 transition-colors">privacy@chants.ca</a>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <Globe className="w-5 h-5 text-primary-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400 mb-1">Website</p>
+                    <a href="https://www.chants.ca" className="text-white hover:text-primary-400 transition-colors">www.chants.ca</a>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4 sm:col-span-2">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-5 h-5 text-primary-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400 mb-1">Address</p>
+                    <p className="text-white">Chant Projects Inc.<br />Vancouver, British Columbia, Canada</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Section>
+
         </div>
       </section>
 
